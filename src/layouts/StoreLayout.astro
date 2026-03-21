@@ -17,43 +17,76 @@ const { title = 'Atlas&You — Joyería Artesanal', description = 'Joyería arte
   <meta name="description" content={description} />
   <title>{title}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" />
 </head>
-<body class="bg-stone-50 text-stone-900 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col" style="background:#FAF9F7;">
+
+  <!-- Announcement bar -->
+  <div class="bg-stone-900 text-stone-200 text-xs text-center py-2.5 px-4 tracking-wide">
+    Envío gratis a España a partir de 50€ &nbsp;·&nbsp; Hecho a mano con amor en España
+  </div>
 
   <!-- Navbar -->
-  <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2">
-        <span class="text-2xl font-bold tracking-tight text-stone-900">Atlas<span class="text-amber-700">&You</span></span>
+  <header id="navbar" class="bg-white border-b border-stone-200/70 sticky top-0 z-50 transition-shadow duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="/" class="flex-shrink-0">
+        <span class="font-serif text-2xl tracking-tight text-stone-900" style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;">
+          Atlas<span style="color:#92400E;">&You</span>
+        </span>
       </a>
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href="/tienda" class="hover:text-amber-700 transition-colors">Tienda</a>
-        <a href="/tienda?categoria=pendientes" class="hover:text-amber-700 transition-colors">Pendientes</a>
-        <a href="/tienda?categoria=colgantes" class="hover:text-amber-700 transition-colors">Colgantes</a>
-        <a href="/tienda?categoria=pulseras" class="hover:text-amber-700 transition-colors">Pulseras</a>
-      </nav>
-      <div class="flex items-center gap-4">
-        <a href="/carrito" class="relative p-2 hover:text-amber-700 transition-colors" id="cart-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span id="cart-count" class="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="/tienda" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
+          Tienda
         </a>
-        <!-- Mobile menu button -->
-        <button class="md:hidden p-2" id="mobile-menu-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        <a href="/tienda?categoria=pendientes" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
+          Pendientes
+        </a>
+        <a href="/tienda?categoria=colgantes" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
+          Colgantes
+        </a>
+        <a href="/tienda?categoria=pulseras" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
+          Pulseras
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <a href="/tienda" class="hidden md:flex p-2 text-stone-500 hover:text-stone-900 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </a>
+        <!-- Cart -->
+        <a href="/carrito" class="relative p-2 text-stone-500 hover:text-stone-900 transition-colors" id="cart-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span id="cart-count" class="absolute -top-0.5 -right-0.5 text-white text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center hidden" style="background:#92400E;">0</span>
+        </a>
+        <!-- Mobile menu -->
+        <button class="md:hidden p-2 text-stone-500 hover:text-stone-900 transition-colors" id="mobile-menu-btn" aria-label="Menú">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
     </div>
-    <!-- Mobile nav -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-stone-200 bg-white">
-      <nav class="flex flex-col px-4 py-4 gap-4 text-sm font-medium">
-        <a href="/tienda" class="hover:text-amber-700">Tienda</a>
-        <a href="/tienda?categoria=pendientes" class="hover:text-amber-700">Pendientes</a>
-        <a href="/tienda?categoria=colgantes" class="hover:text-amber-700">Colgantes</a>
-        <a href="/tienda?categoria=pulseras" class="hover:text-amber-700">Pulseras</a>
+
+    <!-- Mobile nav panel -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
+      <nav class="flex flex-col px-6 py-6 gap-5">
+        <a href="/tienda" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Tienda</a>
+        <a href="/tienda?categoria=pendientes" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Pendientes</a>
+        <a href="/tienda?categoria=colgantes" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Colgantes</a>
+        <a href="/tienda?categoria=pulseras" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Pulseras</a>
+        <a href="/carrito" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Carrito</a>
       </nav>
     </div>
   </header>
@@ -62,43 +95,68 @@ const { title = 'Atlas&You — Joyería Artesanal', description = 'Joyería arte
     <slot />
   </main>
 
-  <footer class="bg-stone-900 text-stone-300 mt-20">
-    <div class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div>
-        <h3 class="text-white font-bold text-lg mb-3">Atlas<span class="text-amber-400">&You</span></h3>
-        <p class="text-sm leading-relaxed">Joyería artesanal única, hecha a mano con arcilla polimérica y resina. Cada pieza es irrepetible.</p>
+  <!-- Footer -->
+  <footer style="background:#FAFAF9;border-top:1px solid #E7E5E4;">
+    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-1">
+        <span class="font-serif text-xl text-stone-900 block mb-4" style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;">
+          Atlas<span style="color:#92400E;">&You</span>
+        </span>
+        <p class="text-stone-500 text-sm leading-relaxed max-w-52">
+          Joyería artesanal única, hecha a mano con arcilla polimérica y resina.
+        </p>
+        <div class="flex gap-4 mt-5">
+          <a href="https://instagram.com/atlasandyou" target="_blank" rel="noopener" class="text-stone-400 hover:text-stone-700 transition-colors" aria-label="Instagram">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
       </div>
+
+      <!-- Tienda -->
       <div>
-        <h4 class="text-white font-semibold mb-3">Tienda</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="/tienda" class="hover:text-amber-400 transition-colors">Todos los productos</a></li>
-          <li><a href="/tienda?categoria=pendientes" class="hover:text-amber-400 transition-colors">Pendientes</a></li>
-          <li><a href="/tienda?categoria=colgantes" class="hover:text-amber-400 transition-colors">Colgantes</a></li>
-          <li><a href="/tienda?categoria=pulseras" class="hover:text-amber-400 transition-colors">Pulseras</a></li>
+        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Tienda</h5>
+        <ul class="space-y-3 text-sm text-stone-600">
+          <li><a href="/tienda" class="hover:text-stone-900 transition-colors">Todos los productos</a></li>
+          <li><a href="/tienda?categoria=pendientes" class="hover:text-stone-900 transition-colors">Pendientes</a></li>
+          <li><a href="/tienda?categoria=colgantes" class="hover:text-stone-900 transition-colors">Colgantes</a></li>
+          <li><a href="/tienda?categoria=pulseras" class="hover:text-stone-900 transition-colors">Pulseras</a></li>
         </ul>
       </div>
+
+      <!-- Información -->
       <div>
-        <h4 class="text-white font-semibold mb-3">Información</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="/envios" class="hover:text-amber-400 transition-colors">Envíos y devoluciones</a></li>
-          <li><a href="/contacto" class="hover:text-amber-400 transition-colors">Contacto</a></li>
-          <li><a href="/aviso-legal" class="hover:text-amber-400 transition-colors">Aviso legal</a></li>
-          <li><a href="/privacidad" class="hover:text-amber-400 transition-colors">Privacidad</a></li>
+        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Información</h5>
+        <ul class="space-y-3 text-sm text-stone-600">
+          <li><a href="/envios" class="hover:text-stone-900 transition-colors">Envíos y devoluciones</a></li>
+          <li><a href="/cuidados" class="hover:text-stone-900 transition-colors">Guía de cuidados</a></li>
+          <li><a href="/aviso-legal" class="hover:text-stone-900 transition-colors">Aviso legal</a></li>
+          <li><a href="/privacidad" class="hover:text-stone-900 transition-colors">Privacidad</a></li>
+        </ul>
+      </div>
+
+      <!-- Contacto -->
+      <div>
+        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Contacto</h5>
+        <ul class="space-y-3 text-sm text-stone-600">
+          <li><a href="/contacto" class="hover:text-stone-900 transition-colors">Escríbenos</a></li>
+          <li class="text-stone-400 text-xs leading-relaxed">Respondemos en menos de 24 horas</li>
         </ul>
       </div>
     </div>
-    <div class="border-t border-stone-800 py-6 text-center text-xs text-stone-500">
-      © {new Date().getFullYear()} Atlas&You. Todos los derechos reservados.
+
+    <div style="border-top:1px solid #E7E5E4;" class="py-5 text-center text-xs text-stone-400">
+      © {new Date().getFullYear()} Atlas&You — Joyería artesanal hecha en España
     </div>
   </footer>
 
   <script>
-    // Mobile menu toggle
     document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
       document.getElementById('mobile-menu')?.classList.toggle('hidden');
     });
 
-    // Cart count from localStorage
     function updateCartCount() {
       const cart = JSON.parse(localStorage.getItem('atlas_cart') || '[]');
       const count = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
