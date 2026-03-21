@@ -5,18 +5,15 @@ import { getDb, IS_MOCK } from '../../lib/firebase-admin';
 import { mockProducts } from '../../lib/mock-data';
 
 const { slug } = Astro.params;
-
 let product: any = null;
 let related: any[] = [];
 
 if (IS_MOCK) {
   product = mockProducts.find(p => p.slug === slug && p.active) || null;
-  if (product) {
-    related = mockProducts.filter(p => p.category_id === product.category_id && p.id !== product.id && p.active).slice(0, 4);
-  }
+  if (product) related = mockProducts.filter(p => p.category_id === product.category_id && p.id !== product.id && p.active).slice(0,4);
 } else {
   const db = getDb();
-  const snap = await db.collection('products').where('slug', '==', slug).where('active', '==', true).limit(1).get();
+  const snap = await db.collection('products').where('slug','==',slug).where('active','==',true).limit(1).get();
   if (!snap.empty) {
     const doc = snap.docs[0];
     product = { id: doc.id, ...doc.data() };
@@ -24,14 +21,8 @@ if (IS_MOCK) {
       const catDoc = await db.collection('categories').doc(product.category_id).get();
       if (catDoc.exists) product.categories = { id: catDoc.id, ...catDoc.data() };
     }
-    const relSnap = await db.collection('products')
-      .where('category_id', '==', product.category_id)
-      .where('active', '==', true)
-      .limit(5).get();
-    related = relSnap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .filter((p: any) => p.id !== product.id)
-      .slice(0, 4);
+    const relSnap = await db.collection('products').where('category_id','==',product.category_id).where('active','==',true).limit(5).get();
+    related = relSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter((p: any) => p.id !== product.id).slice(0,4);
   }
 }
 
@@ -45,117 +36,105 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
 <StoreLayout title={`${product.name} — Atlas&You`} description={product.description}>
 
-  <div class="max-w-7xl mx-auto px-6 py-10">
+  <div style="max-width:1440px;margin:0 auto;padding:40px 32px 80px;">
 
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-[11px] font-medium tracking-wide uppercase text-stone-400 mb-10">
-      <a href="/" class="hover:text-stone-700 transition-colors">Inicio</a>
-      <span>/</span>
-      <a href="/tienda" class="hover:text-stone-700 transition-colors">Tienda</a>
+    <nav style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9E9589;margin-bottom:48px;">
+      <a href="/" style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">Inicio</a>
+      <span style="color:#DDD8C8;">/</span>
+      <a href="/tienda" style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">Tienda</a>
       {product.categories && (
         <>
-          <span>/</span>
-          <a href={`/tienda?categoria=${product.categories.slug}`} class="hover:text-stone-700 transition-colors">
-            {product.categories.name}
-          </a>
+          <span style="color:#DDD8C8;">/</span>
+          <a href={`/tienda?categoria=${product.categories.slug}`} style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">{product.categories.name}</a>
         </>
       )}
-      <span>/</span>
-      <span class="text-stone-600">{product.name}</span>
+      <span style="color:#DDD8C8;">/</span>
+      <span style="color:#252525;">{product.name}</span>
     </nav>
 
-    <!-- Main product layout -->
-    <div class="grid md:grid-cols-[1fr,480px] gap-12 lg:gap-20">
+    <!-- Main layout -->
+    <div class="product-layout">
 
       <!-- Gallery -->
-      <div class="space-y-3">
-        <!-- Main image — 4:5 portrait -->
-        <div class="overflow-hidden bg-stone-100" style="aspect-ratio:4/5;">
-          <img
-            id="main-image"
+      <div>
+        <!-- Main image -->
+        <div style="aspect-ratio:4/5;overflow:hidden;background:#FFFFFF;border:1px solid #DDD8C8;box-shadow:0 2px 16px rgba(37,37,37,0.06);">
+          <img id="main-image"
             src={product.images?.[0] || ''}
             alt={product.name}
-            class="w-full h-full object-cover transition-opacity duration-300"
+            style="width:100%;height:100%;object-fit:cover;transition:opacity 0.25s;"
           />
         </div>
 
         <!-- Thumbnails -->
         {product.images && product.images.length > 1 && (
-          <div class="grid grid-cols-4 gap-2">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
             {product.images.map((img: string, i: number) => (
-              <button
-                class="overflow-hidden bg-stone-100 border-2 transition-all duration-150 thumbnail-btn"
-                style={`aspect-ratio:1;border-color:${i === 0 ? '#1C1917' : 'transparent'};`}
-                data-src={img}
-                data-index={i}
+              <button class="thumb-btn"
+                style={`aspect-ratio:1;overflow:hidden;background:#fff;border:1.5px solid ${i === 0 ? '#3F5147' : '#DDD8C8'};cursor:pointer;padding:0;transition:border-color 0.15s;`}
+                data-src={img} data-index={i}
               >
-                <img src={img} alt={`${product.name} ${i + 1}`} class="w-full h-full object-cover" />
+                <img src={img} alt={`${product.name} ${i+1}`} style="width:100%;height:100%;object-fit:cover;display:block;" />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <!-- Product info -->
-      <div class="flex flex-col">
-
-        <!-- Category + badges -->
-        <div class="flex items-center gap-3 mb-3">
+      <!-- Info -->
+      <div>
+        <!-- Category + sale -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
           {product.categories && (
             <a href={`/tienda?categoria=${product.categories.slug}`}
-              class="text-[10px] font-semibold tracking-widest uppercase transition-colors"
-              style="color:#92400E;">
+              style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#3F5147;text-decoration:none;">
               {product.categories.name}
             </a>
           )}
           {isOnSale && (
-            <span class="text-[10px] font-semibold tracking-wider uppercase text-white px-2 py-0.5" style="background:#92400E;">
-              -{discount}%
-            </span>
+            <span style="background:#3F5147;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;">-{discount}%</span>
           )}
         </div>
 
         <!-- Name -->
-        <h1 class="font-serif text-stone-900 leading-tight mb-4"
-            style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;font-size:clamp(2rem,4vw,2.75rem);">
+        <h1 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(1.8rem,3.5vw,2.8rem);color:#252525;margin:0 0 20px;line-height:1.15;">
           {product.name}
         </h1>
 
         <!-- Price -->
-        <div class="flex items-baseline gap-3 mb-2">
-          <span class="text-2xl font-medium text-stone-900">{product.price.toFixed(2)}€</span>
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+          <span style="font-size:1.5rem;font-weight:700;color:#252525;">{product.price.toFixed(2)} €</span>
           {isOnSale && (
-            <span class="text-lg text-stone-400 line-through">{product.compare_at_price.toFixed(2)}€</span>
+            <span style="font-size:1.1rem;color:#9E9589;text-decoration:line-through;">{product.compare_at_price.toFixed(2)} €</span>
           )}
         </div>
-        <p class="text-[11px] text-stone-400 tracking-wide mb-6">IVA incluido · Envío calculado al finalizar compra</p>
+        <p style="font-size:11px;color:#9E9589;letter-spacing:0.05em;margin-bottom:24px;">IVA incluido · Envío calculado al finalizar</p>
 
-        <!-- Stock status -->
+        <!-- Stock alerts -->
         {isOutOfStock && (
-          <div class="flex items-center gap-2 mb-6 p-3 bg-stone-50 border border-stone-200">
-            <span class="w-2 h-2 rounded-full bg-stone-400 flex-shrink-0"></span>
-            <p class="text-sm text-stone-600 font-medium">Agotado — escríbenos para consultar disponibilidad</p>
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f5f3ef;border:1px solid #DDD8C8;margin-bottom:20px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#9E9589;flex-shrink:0;"></span>
+            <p style="font-size:13px;color:#716A56;font-weight:700;margin:0;">Agotado — escríbenos para consultar disponibilidad</p>
           </div>
         )}
         {isLowStock && (
-          <div class="flex items-center gap-2 mb-6 p-3 bg-amber-50 border border-amber-200">
-            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:#D97706;"></span>
-            <p class="text-sm font-medium" style="color:#92400E;">Solo quedan {product.stock} unidades</p>
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#eef2ee;border:1px solid #c4d4c6;margin-bottom:20px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#3F5147;flex-shrink:0;"></span>
+            <p style="font-size:13px;color:#3F5147;font-weight:700;margin:0;">Solo quedan {product.stock} unidades</p>
           </div>
         )}
 
         <!-- Description -->
-        <div class="text-stone-600 text-[15px] leading-relaxed mb-8 border-b border-stone-100 pb-8">
-          <p>{product.description}</p>
+        <div style="border-top:1px solid #DDD8C8;border-bottom:1px solid #DDD8C8;padding:20px 0;margin-bottom:24px;">
+          <p style="font-size:14px;color:#716A56;line-height:1.75;margin:0;">{product.description}</p>
         </div>
 
         <!-- Tags -->
         {product.tags && product.tags.length > 0 && (
-          <div class="flex flex-wrap gap-1.5 mb-8">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;">
             {product.tags.map((tag: string) => (
-              <span class="text-[10px] font-medium tracking-widest uppercase text-stone-500 border border-stone-200 px-2.5 py-1">
-                {tag}
-              </span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#716A56;border:1px solid #DDD8C8;padding:4px 10px;">{tag}</span>
             ))}
           </div>
         )}
@@ -164,78 +143,52 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
         <button
           id="add-to-cart"
           disabled={isOutOfStock}
-          data-product={JSON.stringify({ id: product.id, name: product.name, price: product.price, image: product.images?.[0] || '', slug: product.slug, stock: product.stock })}
-          class="w-full py-4 text-[12px] font-medium tracking-widest uppercase text-white transition-all duration-200 disabled:cursor-not-allowed mb-3"
-          style={isOutOfStock
-            ? 'background:#D6D3D1;letter-spacing:0.1em;'
-            : 'background:#1C1917;letter-spacing:0.1em;'}
-          onmouseenter={isOutOfStock ? '' : "if(!this.disabled)this.style.background='#44403C'"}
-          onmouseleave={isOutOfStock ? '' : "if(!this.disabled)this.style.background='#1C1917'"}
+          data-product={JSON.stringify({ id:product.id, name:product.name, price:product.price, image:product.images?.[0]||'', slug:product.slug, stock:product.stock })}
+          style={`width:100%;padding:15px 32px;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;font-family:'Quattrocento Sans',sans-serif;border:none;cursor:${isOutOfStock?'not-allowed':'pointer'};transition:background 0.2s;${isOutOfStock ? 'background:#DDD8C8;color:#9E9589;' : 'background:#3F5147;color:#FAFAF8;'}`}
+          onmouseenter={isOutOfStock?'':"if(!this.disabled)this.style.background='#2C3B31'"}
+          onmouseleave={isOutOfStock?'':"if(!this.disabled)this.style.background='#3F5147'"}
         >
           {isOutOfStock ? 'Agotado' : 'Añadir al carrito'}
         </button>
 
-        <p class="text-[11px] text-stone-400 text-center tracking-wide mb-8">
-          ✦ Envío gratis a España a partir de 50€
+        <p style="font-size:11px;color:#9E9589;text-align:center;margin-top:10px;letter-spacing:0.05em;">
+          ✦ Envío gratis a España a partir de 50 €
         </p>
 
-        <!-- Accordion details -->
-        <div class="space-y-0 border-t border-stone-200">
-          <details class="group border-b border-stone-200">
-            <summary class="flex justify-between items-center cursor-pointer py-4 text-sm font-medium text-stone-800 select-none">
-              <span>Materiales y cuidados</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-              </svg>
-            </summary>
-            <div class="pb-4 text-sm text-stone-500 leading-relaxed space-y-2">
-              <p>Fabricado artesanalmente con arcilla polimérica de alta calidad y resina UV hipoalergénica.</p>
-              <p>Para mantener tu joya en perfecto estado, evita el contacto prolongado con agua, perfumes y productos químicos. Guárdala en un lugar seco.</p>
-            </div>
-          </details>
-
-          <details class="group border-b border-stone-200">
-            <summary class="flex justify-between items-center cursor-pointer py-4 text-sm font-medium text-stone-800 select-none">
-              <span>Envíos y devoluciones</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-              </svg>
-            </summary>
-            <div class="pb-4 text-sm text-stone-500 leading-relaxed space-y-2">
-              <p>Procesamos tu pedido en 1–2 días hábiles. Entrega en 2–4 días hábiles para España.</p>
-              <p>Aceptamos devoluciones en 14 días desde la recepción si la pieza está en perfecto estado.</p>
-            </div>
-          </details>
-
-          <details class="group border-b border-stone-200">
-            <summary class="flex justify-between items-center cursor-pointer py-4 text-sm font-medium text-stone-800 select-none">
-              <span>Hecho a mano — pequeñas variaciones</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-              </svg>
-            </summary>
-            <div class="pb-4 text-sm text-stone-500 leading-relaxed">
-              <p>Al ser artesanal, cada pieza puede tener pequeñas variaciones en forma, color o textura. Esto es parte de su encanto — no hay dos piezas exactamente iguales.</p>
-            </div>
-          </details>
+        <!-- Accordions -->
+        <div style="margin-top:24px;border-top:1px solid #DDD8C8;">
+          {[
+            { t:'Materiales y cuidados', c:'Fabricado artesanalmente con arcilla polimérica de alta calidad y resina UV hipoalergénica. Evita el contacto con agua, perfumes y productos químicos. Guárdala en lugar seco.' },
+            { t:'Envíos y devoluciones', c:'Procesamos en 1–2 días hábiles. Entrega en 2–4 días hábiles en España. Devoluciones aceptadas en 14 días desde recepción en perfecto estado.' },
+            { t:'Pequeñas variaciones artesanales', c:'Al ser hecha a mano, cada pieza puede presentar pequeñas variaciones en forma, color o textura. Esto es parte de su encanto — no hay dos piezas exactamente iguales.' },
+          ].map(item => (
+            <details style="border-bottom:1px solid #DDD8C8;">
+              <summary style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer;font-size:13px;font-weight:700;color:#252525;letter-spacing:0.02em;list-style:none;">
+                {item.t}
+                <span style="font-size:18px;color:#9E9589;font-weight:300;transition:transform 0.2s;">+</span>
+              </summary>
+              <div style="padding:0 0 16px;">
+                <p style="font-size:13px;color:#716A56;line-height:1.75;margin:0;">{item.c}</p>
+              </div>
+            </details>
+          ))}
         </div>
       </div>
     </div>
 
     <!-- Related products -->
     {related.length > 0 && (
-      <section class="mt-24 md:mt-32 pt-12" style="border-top:1px solid #E7E5E4;">
-        <div class="flex items-end justify-between mb-10">
-          <h2 class="font-serif text-3xl md:text-4xl text-stone-900"
-              style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
+      <section style="margin-top:80px;padding-top:48px;border-top:1px solid #DDD8C8;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;">
+          <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(1.6rem,3vw,2.2rem);color:#252525;margin:0;">
             También te puede gustar
           </h2>
           <a href={product.categories ? `/tienda?categoria=${product.categories.slug}` : '/tienda'}
-            class="hidden md:inline-flex text-[11px] font-medium tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors items-center gap-1.5">
-            Ver más <span>→</span>
+            style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">
+            Ver más →
           </a>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
+        <div class="related-grid">
           {related.map((p: any) => <ProductCard product={p} />)}
         </div>
       </section>
@@ -245,16 +198,16 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
   <script>
     // Thumbnail gallery
-    document.querySelectorAll('.thumbnail-btn').forEach((btn, _, all) => {
+    document.querySelectorAll('.thumb-btn').forEach((btn, _, all) => {
       btn.addEventListener('click', () => {
         const src = (btn as HTMLElement).dataset.src;
         const mainImg = document.getElementById('main-image') as HTMLImageElement;
         if (mainImg && src) {
           mainImg.style.opacity = '0';
-          setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 150);
+          setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 200);
         }
-        all.forEach(b => (b as HTMLElement).style.borderColor = 'transparent');
-        (btn as HTMLElement).style.borderColor = '#1C1917';
+        all.forEach(b => (b as HTMLElement).style.borderColor = '#DDD8C8');
+        (btn as HTMLElement).style.borderColor = '#3F5147';
       });
     });
 
@@ -264,20 +217,43 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
       if (btn.disabled) return;
       const productData = JSON.parse(btn.dataset.product || '{}');
       const cart = JSON.parse(localStorage.getItem('atlas_cart') || '[]');
-      const existing = cart.find((item: any) => item.id === productData.id);
+      const existing = cart.find((i: any) => i.id === productData.id);
       if (existing) { if (existing.quantity < productData.stock) existing.quantity++; }
       else { cart.push({ ...productData, quantity: 1 }); }
       localStorage.setItem('atlas_cart', JSON.stringify(cart));
       window.dispatchEvent(new Event('cart-updated'));
 
-      const original = btn.textContent;
+      const orig = btn.textContent;
       btn.textContent = '✓ Añadido al carrito';
-      btn.style.background = '#166534';
-      setTimeout(() => {
-        btn.textContent = original;
-        btn.style.background = '#1C1917';
-      }, 2000);
+      btn.style.background = '#2C3B31';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = '#3F5147'; }, 2000);
+    });
+
+    // Accordion + icon
+    document.querySelectorAll('details').forEach(d => {
+      d.addEventListener('toggle', () => {
+        const icon = d.querySelector('summary span') as HTMLElement;
+        if (icon) icon.textContent = d.open ? '−' : '+';
+      });
     });
   </script>
 
 </StoreLayout>
+
+<style>
+  .product-layout {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 64px;
+    align-items: start;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 960px) {
+    .product-layout { grid-template-columns: 1fr; gap: 40px; }
+    .related-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  }
+</style>

@@ -13,8 +13,8 @@ if (IS_MOCK) {
 } else {
   const db = getDb();
   const [featSnap, catSnap] = await Promise.all([
-    db.collection('products').where('active', '==', true).where('featured', '==', true).limit(8).get(),
-    db.collection('categories').where('active', '==', true).orderBy('position').get(),
+    db.collection('products').where('active','==',true).where('featured','==',true).limit(8).get(),
+    db.collection('categories').where('active','==',true).orderBy('position').get(),
   ]);
   featured = featSnap.docs.map(d => ({ id: d.id, ...d.data() }));
   categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -23,127 +23,82 @@ if (IS_MOCK) {
 
 <StoreLayout title="Atlas&You — Joyería Artesanal Hecha a Mano">
 
-  <!-- ─── HERO ──────────────────────────────────────────────────────── -->
-  <section class="relative overflow-hidden" style="min-height:92vh;background:#1C1917;">
+  <!-- ── HERO ──────────────────────────────────────────────────── -->
+  <section style="background:#2C3B31;position:relative;overflow:hidden;min-height:88vh;display:flex;align-items:center;">
 
-    <!-- Warm gradient background (replace with lifestyle photo in production) -->
-    <div class="absolute inset-0"
-      style="background:linear-gradient(135deg,#1C1917 0%,#292524 40%,#44403C 70%,#78350F 100%);opacity:0.97;">
-    </div>
+    <!-- Texture grain overlay -->
+    <div style="position:absolute;inset:0;opacity:0.06;background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E&quot;);"></div>
 
-    <!-- Subtle texture overlay -->
-    <div class="absolute inset-0 opacity-[0.04]"
-      style="background-image:url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);">
-    </div>
+    <!-- Warm accent shape -->
+    <div style="position:absolute;right:-80px;top:-80px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,#5a7a63 0%,transparent 70%);opacity:0.3;"></div>
+    <div style="position:absolute;left:40%;bottom:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,#8B7355 0%,transparent 70%);opacity:0.2;"></div>
 
-    <div class="relative max-w-7xl mx-auto px-6 flex flex-col justify-center" style="min-height:92vh;">
-      <div class="max-w-3xl pt-16 pb-24">
-
-        <!-- Eyebrow -->
-        <p class="text-[11px] font-semibold tracking-[0.3em] uppercase text-amber-400/80 mb-6">
-          Joyería Artesanal · España
+    <div style="max-width:1440px;margin:0 auto;padding:80px 32px;position:relative;z-index:1;">
+      <div style="max-width:640px;" class="fade-up">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#a8c4b0;margin-bottom:24px;">
+          Joyería Artesanal · Hecha en España
         </p>
-
-        <!-- Headline -->
-        <h1 class="font-serif text-white leading-[1.05] mb-8"
-            style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;">
-          Joyas que hablan<br />
-          <em style="font-style:italic;">de&nbsp;ti</em>
+        <h1 style="font-family:'Trirong',Georgia,serif;font-weight:200;font-size:clamp(2.8rem,7vw,5.5rem);color:#FAFAF8;line-height:1.08;margin:0 0 28px;letter-spacing:-0.01em;">
+          Joyas que<br/><em style="font-style:italic;font-weight:300;">cuentan historias</em>
         </h1>
-
-        <!-- Subline -->
-        <p class="text-stone-400 text-lg leading-relaxed mb-10 max-w-xl" style="font-size:clamp(1rem,2vw,1.125rem);">
-          Pendientes, colgantes y pulseras creados a mano con arcilla polimérica y resina.
-          Cada pieza es única e irrepetible.
+        <p style="font-size:16px;color:#a8c4b0;line-height:1.7;margin-bottom:40px;max-width:480px;">
+          Pendientes, colgantes y pulseras creados a mano con arcilla polimérica y resina. Cada pieza, única e irrepetible.
         </p>
-
-        <!-- CTAs -->
-        <div class="flex flex-wrap gap-4 items-center">
-          <a href="/tienda"
-            class="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium tracking-wider uppercase text-white transition-all duration-200"
-            style="background:#92400E;letter-spacing:0.1em;">
-            Explorar colección
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+          <a href="/tienda" style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;color:#252525;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:14px 32px;text-decoration:none;transition:background 0.2s;" onmouseenter="this.style.background='#e8ede9'" onmouseleave="this.style.background='#FAFAF8'">
+            Ver colección →
           </a>
-          <a href="#historia"
-            class="text-sm font-medium tracking-wider uppercase text-stone-400 hover:text-white transition-colors"
-            style="letter-spacing:0.1em;">
+          <a href="#historia" style="font-size:12px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:#a8c4b0;text-decoration:none;" onmouseenter="this.style.color='#FAFAF8'" onmouseleave="this.style.color='#a8c4b0'">
             Nuestra historia
           </a>
         </div>
       </div>
-
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
-        <div class="w-px h-12 bg-white animate-pulse origin-top" style="animation-duration:2s;"></div>
-      </div>
     </div>
   </section>
 
-  <!-- ─── BRAND VALUES STRIP ─────────────────────────────────────────── -->
-  <section style="background:#FFFFFF;border-bottom:1px solid #E7E5E4;">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+  <!-- ── VALUES STRIP ─────────────────────────────────────────── -->
+  <div style="background:#FFFFFF;border-bottom:1px solid #DDD8C8;">
+    <div style="max-width:1440px;margin:0 auto;padding:0 32px;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);divide-x:1px solid #DDD8C8;">
         {[
-          { icon: '✦', label: 'Hecho a mano', sub: 'Cada pieza, única' },
-          { icon: '♻', label: 'Materiales seguros', sub: 'Arcilla y resina hipoalergénica' },
-          { icon: '⬖', label: 'Envío gratis', sub: 'A partir de 50€ en España' },
-          { icon: '◎', label: 'Devoluciones', sub: '14 días sin preguntas' },
-        ].map(item => (
-          <div class="flex flex-col items-center gap-1 py-2">
-            <span class="text-base text-amber-700/60">{item.icon}</span>
-            <span class="text-[12px] font-medium tracking-wide text-stone-800 uppercase" style="letter-spacing:0.08em;">{item.label}</span>
-            <span class="text-[11px] text-stone-400 hidden md:block">{item.sub}</span>
+          ['✦', 'Hecho a mano', 'Cada pieza, única'],
+          ['◈', 'Materiales seguros', 'Hipoalergénicos'],
+          ['⬖', 'Envío gratis', '+50 € en España'],
+          ['◎', 'Devoluciones', '14 días'],
+        ].map(([icon, label, sub]) => (
+          <div style="padding:18px 24px;text-align:center;border-right:1px solid #DDD8C8;">
+            <span style="font-size:14px;color:#716A56;">{icon}</span>
+            <p style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#252525;margin:4px 0 2px;">{label}</p>
+            <p style="font-size:11px;color:#9E9589;">{sub}</p>
           </div>
         ))}
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ─── COLLECTIONS ─────────────────────────────────────────────────── -->
+  <!-- ── COLLECTIONS ──────────────────────────────────────────── -->
   {categories.length > 0 && (
-    <section class="max-w-7xl mx-auto px-6 py-20 md:py-28">
-      <div class="flex items-end justify-between mb-10">
+    <section style="max-width:1440px;margin:0 auto;padding:80px 32px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;">
         <div>
-          <p class="text-[11px] font-semibold tracking-[0.25em] uppercase text-stone-400 mb-2">Explora</p>
-          <h2 class="font-serif text-4xl md:text-5xl text-stone-900"
-              style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
-            Nuestras colecciones
-          </h2>
+          <p style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#9E9589;margin-bottom:8px;">Explorar</p>
+          <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(2rem,4vw,3rem);color:#252525;margin:0;">Nuestras colecciones</h2>
         </div>
-        <a href="/tienda" class="hidden md:inline-flex text-[12px] font-medium tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors items-center gap-1.5">
-          Ver todo
-          <span>→</span>
-        </a>
+        <a href="/tienda" style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">Ver todo →</a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {categories.slice(0, 3).map((cat: any, i: number) => (
-          <a href={`/tienda?categoria=${cat.slug}`}
-            class={`group relative overflow-hidden block ${i === 0 ? 'md:row-span-2' : ''}`}
-            style={`aspect-ratio:${i === 0 ? '3/4' : '3/2'};background:#E7E5E4;`}>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" class="collections-grid">
+        {categories.slice(0,3).map((cat: any, i: number) => (
+          <a href={`/tienda?categoria=${cat.slug}`} class="collection-tile" style={`display:block;position:relative;overflow:hidden;text-decoration:none;aspect-ratio:${i === 0 ? '3/4' : '4/3'};background:#DDD8C8;`}>
             {cat.image_url ? (
-              <img
-                src={cat.image_url}
-                alt={cat.name}
-                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-              />
+              <img src={cat.image_url} alt={cat.name} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.7s ease;" class="collection-img"/>
             ) : (
-              <div class="absolute inset-0"
-                style={`background:${i === 0 ? 'linear-gradient(160deg,#FEF3C7,#D97706)' : i === 1 ? 'linear-gradient(160deg,#E7E5E4,#78716C)' : 'linear-gradient(160deg,#FEF9C3,#CA8A04)'}`}>
-              </div>
+              <div style={`position:absolute;inset:0;background:${i===0?'linear-gradient(160deg,#e8ede9,#3F5147)':i===1?'linear-gradient(160deg,#f0ede8,#8B7355)':'linear-gradient(160deg,#e8e6e0,#5a7a63)'};`}></div>
             )}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent transition-opacity duration-300 group-hover:from-black/60"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <h3 class="font-serif text-white mb-1"
-                  style={`font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;font-size:${i === 0 ? '2rem' : '1.5rem'};`}>
-                {cat.name}
-              </h3>
-              <span class="text-[11px] font-medium tracking-widest uppercase text-white/70 inline-flex items-center gap-1.5 transition-all duration-300 group-hover:gap-3">
-                Descubrir <span>→</span>
-              </span>
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(37,37,37,0.55) 0%,transparent 60%);transition:opacity 0.3s;" class="collection-overlay"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px;">
+              <h3 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:1.5rem;color:#FAFAF8;margin:0 0 6px;">{cat.name}</h3>
+              <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,250,248,0.7);">Descubrir →</span>
             </div>
           </a>
         ))}
@@ -151,173 +106,159 @@ if (IS_MOCK) {
     </section>
   )}
 
-  <!-- ─── FEATURED PRODUCTS ───────────────────────────────────────────── -->
+  <!-- ── FEATURED PRODUCTS ────────────────────────────────────── -->
   {featured.length > 0 && (
-    <section style="background:#FFFFFF;" class="py-20 md:py-28">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="flex items-end justify-between mb-10">
+    <section style="background:#FAFAF8;padding:80px 0;border-top:1px solid #DDD8C8;border-bottom:1px solid #DDD8C8;">
+      <div style="max-width:1440px;margin:0 auto;padding:0 32px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;">
           <div>
-            <p class="text-[11px] font-semibold tracking-[0.25em] uppercase text-stone-400 mb-2">Selección</p>
-            <h2 class="font-serif text-4xl md:text-5xl text-stone-900"
-                style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
-              Piezas destacadas
-            </h2>
+            <p style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#9E9589;margin-bottom:8px;">Selección</p>
+            <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(2rem,4vw,3rem);color:#252525;margin:0;">Piezas destacadas</h2>
           </div>
-          <a href="/tienda" class="hidden md:inline-flex text-[12px] font-medium tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors items-center gap-1.5">
-            Ver todo <span>→</span>
-          </a>
+          <a href="/tienda" style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">Ver todo →</a>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
+        <div class="products-grid">
           {featured.map((product: any) => <ProductCard product={product} />)}
         </div>
 
-        <div class="mt-12 text-center md:hidden">
-          <a href="/tienda"
-            class="inline-flex items-center gap-2 px-8 py-3 text-[12px] font-medium tracking-widest uppercase border border-stone-300 text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200">
-            Ver toda la colección →
+        <div style="margin-top:48px;text-align:center;">
+          <a href="/tienda" style="display:inline-flex;align-items:center;gap:8px;border:1px solid #252525;color:#252525;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:13px 36px;text-decoration:none;transition:all 0.2s;" onmouseenter="this.style.background='#252525';this.style.color='#FAFAF8'" onmouseleave="this.style.background='transparent';this.style.color='#252525'">
+            Ver toda la colección
           </a>
         </div>
       </div>
     </section>
   )}
 
-  <!-- ─── MAKER STORY ─────────────────────────────────────────────────── -->
-  <section id="historia" class="max-w-7xl mx-auto px-6 py-20 md:py-28">
-    <div class="grid md:grid-cols-2 gap-16 items-center">
+  <!-- ── MAKER STORY ──────────────────────────────────────────── -->
+  <section id="historia" style="max-width:1440px;margin:0 auto;padding:80px 32px;">
+    <div class="story-grid">
 
-      <!-- Image side -->
-      <div class="relative">
-        <div class="aspect-[4/5] bg-stone-100 overflow-hidden">
-          <!-- Replace with actual photo of maker/studio -->
-          <div class="w-full h-full flex items-center justify-center"
-            style="background:linear-gradient(160deg,#FEF3C7 0%,#D97706 50%,#92400E 100%);">
-            <div class="text-center text-white/80 p-8">
-              <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+      <!-- Image -->
+      <div style="position:relative;">
+        <div style="aspect-ratio:4/5;background:#DDD8C8;overflow:hidden;">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#e8ede9 0%,#3F5147 100%);">
+            <div style="text-align:center;padding:32px;color:rgba(250,250,248,0.6);">
+              <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5" style="margin:0 auto 12px;display:block;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              <p class="text-sm opacity-60 font-medium tracking-widest uppercase">Foto de la artesana</p>
+              <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Foto de la artesana</span>
             </div>
           </div>
         </div>
-        <!-- Decorative accent -->
-        <div class="absolute -bottom-4 -right-4 w-32 h-32 -z-10 hidden md:block"
-          style="background:#FEF3C7;"></div>
+        <!-- Decorative small square -->
+        <div style="position:absolute;bottom:-16px;right:-16px;width:80px;height:80px;background:#DDD8C8;z-index:-1;"></div>
       </div>
 
-      <!-- Text side -->
-      <div>
-        <p class="text-[11px] font-semibold tracking-[0.25em] uppercase text-stone-400 mb-4">Sobre Atlas&You</p>
-        <h2 class="font-serif text-4xl md:text-5xl text-stone-900 mb-6 leading-tight"
-            style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
-          Artesanía hecha<br />con alma
+      <!-- Text -->
+      <div style="display:flex;flex-direction:column;justify-content:center;padding:0 0 0 8px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#9E9589;margin-bottom:16px;">Sobre Atlas&amp;You</p>
+        <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(2rem,4vw,3rem);color:#252525;margin:0 0 24px;line-height:1.15;">
+          Artesanía hecha<br/>con alma
         </h2>
-        <p class="text-stone-600 text-[15px] leading-relaxed mb-5">
-          Cada pieza de Atlas&You nace de la pasión por crear algo completamente único. Trabajamos con arcilla polimérica, resina y otros materiales para dar vida a joyas que cuentan historias.
+        <p style="font-size:14px;color:#716A56;line-height:1.75;margin-bottom:16px;">
+          Cada pieza de Atlas&amp;You nace de la pasión por crear algo completamente único. Trabajamos con arcilla polimérica, resina y otros materiales para dar vida a joyas que cuentan historias.
         </p>
-        <p class="text-stone-600 text-[15px] leading-relaxed mb-8">
+        <p style="font-size:14px;color:#716A56;line-height:1.75;margin-bottom:32px;">
           No hay dos piezas iguales. Lo que tienes en tus manos es completamente irrepetible — como tú.
         </p>
 
-        <!-- Process highlights -->
-        <div class="space-y-4 mb-10">
-          {[
-            'Modelado a mano, pieza a pieza',
-            'Arcilla polimérica de alta calidad',
-            'Acabados en resina UV hipoalergénica',
-            'Cada joya enviada con cuidado y cariño',
-          ].map(item => (
-            <div class="flex items-center gap-3">
-              <span class="w-1 h-1 rounded-full flex-shrink-0" style="background:#92400E;"></span>
-              <span class="text-sm text-stone-600">{item}</span>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:36px;">
+          {['Modelado a mano, pieza a pieza','Arcilla polimérica de alta calidad','Acabados en resina UV hipoalergénica','Cada joya enviada con cuidado y cariño'].map(item => (
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="width:4px;height:4px;border-radius:50%;background:#3F5147;flex-shrink:0;"></span>
+              <span style="font-size:13px;color:#716A56;">{item}</span>
             </div>
           ))}
         </div>
 
-        <a href="/tienda"
-          class="inline-flex items-center gap-2 px-8 py-3.5 text-[12px] font-medium tracking-widest uppercase text-white transition-all duration-200"
-          style="background:#1C1917;letter-spacing:0.1em;">
-          Descubrir la colección
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
+        <a href="/tienda" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:#3F5147;color:#FAFAF8;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:13px 32px;text-decoration:none;transition:background 0.2s;" onmouseenter="this.style.background='#2C3B31'" onmouseleave="this.style.background='#3F5147'">
+          Descubrir la colección →
         </a>
       </div>
     </div>
   </section>
 
-  <!-- ─── MATERIALS SECTION ───────────────────────────────────────────── -->
-  <section style="background:#1C1917;" class="py-20 md:py-28">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="text-center mb-14">
-        <p class="text-[11px] font-semibold tracking-[0.25em] uppercase text-amber-400/60 mb-3">Los materiales</p>
-        <h2 class="font-serif text-4xl md:text-5xl text-white"
-            style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;">
-          Hecho para durar
-        </h2>
+  <!-- ── MATERIALS DARK SECTION ───────────────────────────────── -->
+  <section style="background:#2C3B31;padding:80px 0;border-top:1px solid #3a4f40;border-bottom:1px solid #3a4f40;">
+    <div style="max-width:1440px;margin:0 auto;padding:0 32px;">
+      <div style="text-align:center;margin-bottom:56px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#a8c4b0;margin-bottom:12px;">Los materiales</p>
+        <h2 style="font-family:'Trirong',Georgia,serif;font-weight:200;font-size:clamp(2rem,4vw,3rem);color:#FAFAF8;margin:0;">Hecho para durar</h2>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#3a4f40;" class="materials-grid">
         {[
-          {
-            title: 'Arcilla Polimérica',
-            desc: 'Resistente, ligera y sin alérgenos. Permite crear formas y texturas imposibles con otros materiales.',
-            icon: '◈'
-          },
-          {
-            title: 'Resina UV',
-            desc: 'Acabado brillante o mate, con propiedades hipoalergénicas. Protege la pieza y amplifica sus colores.',
-            icon: '◉'
-          },
-          {
-            title: 'Cierres y bases',
-            desc: 'Acero inoxidable quirúrgico y plata de ley. Sin níquel, sin irritaciones.',
-            icon: '⬡'
-          },
-        ].map(mat => (
-          <div class="p-8 border border-white/10">
-            <div class="text-2xl text-amber-400/50 mb-5">{mat.icon}</div>
-            <h3 class="font-serif text-xl text-white mb-3"
-                style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
-              {mat.title}
-            </h3>
-            <p class="text-stone-400 text-sm leading-relaxed">{mat.desc}</p>
+          { t:'Arcilla Polimérica', d:'Resistente, ligera y sin alérgenos. Permite crear formas y texturas imposibles con otros materiales.', i:'◈' },
+          { t:'Resina UV', d:'Acabado brillante o mate con propiedades hipoalergénicas. Protege la pieza y amplifica sus colores.', i:'◉' },
+          { t:'Cierres y bases', d:'Acero inoxidable quirúrgico y plata de ley. Sin níquel, sin irritaciones.', i:'⬡' },
+        ].map(m => (
+          <div style="background:#2C3B31;padding:48px 40px;">
+            <div style="font-size:24px;color:#a8c4b0;margin-bottom:20px;">{m.i}</div>
+            <h3 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:1.4rem;color:#FAFAF8;margin:0 0 12px;">{m.t}</h3>
+            <p style="font-size:13px;color:#8aab94;line-height:1.75;">{m.d}</p>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- ─── NEWSLETTER ───────────────────────────────────────────────────── -->
-  <section style="background:#FAF9F7;border-top:1px solid #E7E5E4;" class="py-20 md:py-24">
-    <div class="max-w-xl mx-auto px-6 text-center">
-      <p class="text-[11px] font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">Novedades</p>
-      <h2 class="font-serif text-3xl md:text-4xl text-stone-900 mb-4"
-          style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;">
+  <!-- ── NEWSLETTER ────────────────────────────────────────────── -->
+  <section style="background:#FAFAF8;border-top:1px solid #DDD8C8;padding:80px 32px;text-align:center;">
+    <div style="max-width:480px;margin:0 auto;">
+      <p style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#9E9589;margin-bottom:12px;">Novedades</p>
+      <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(1.8rem,4vw,2.5rem);color:#252525;margin:0 0 16px;">
         Sé la primera en saberlo
       </h2>
-      <p class="text-stone-500 text-sm mb-8 leading-relaxed">
-        Nuevas colecciones, piezas de edición limitada y descuentos exclusivos.
-        Sin spam, solo lo que importa.
+      <p style="font-size:14px;color:#716A56;line-height:1.7;margin-bottom:32px;">
+        Nuevas colecciones, piezas de edición limitada y descuentos exclusivos. Sin spam.
       </p>
-      <form class="flex gap-0 max-w-sm mx-auto" onsubmit="return false;">
-        <input
-          type="email"
-          placeholder="tu@email.com"
-          class="flex-1 px-4 py-3 text-sm border border-stone-300 border-r-0 outline-none focus:border-stone-500 bg-white"
-          style="border-radius:0;"
-        />
-        <button
-          type="submit"
-          class="px-6 py-3 text-[11px] font-medium tracking-widest uppercase text-white transition-colors"
-          style="background:#92400E;letter-spacing:0.1em;border-radius:0;"
-          onmouseenter="this.style.background='#78350F'"
-          onmouseleave="this.style.background='#92400E'"
-        >
+      <form style="display:flex;" onsubmit="return false;">
+        <input type="email" placeholder="tu@email.com" style="flex:1;padding:13px 16px;font-size:14px;border:1px solid #DDD8C8;border-right:none;background:#fff;outline:none;font-family:'Quattrocento Sans',sans-serif;" onfocus="this.style.borderColor='#3F5147'" onblur="this.style.borderColor='#DDD8C8'" />
+        <button type="submit" style="padding:13px 24px;background:#3F5147;color:#FAFAF8;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;font-family:'Quattrocento Sans',sans-serif;white-space:nowrap;" onmouseenter="this.style.background='#2C3B31'" onmouseleave="this.style.background='#3F5147'">
           Suscribirse
         </button>
       </form>
-      <p class="text-[11px] text-stone-400 mt-4">Puedes darte de baja cuando quieras.</p>
+      <p style="font-size:11px;color:#9E9589;margin-top:12px;">Puedes darte de baja cuando quieras.</p>
     </div>
   </section>
 
 </StoreLayout>
+
+<style>
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .materials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #3a4f40;
+  }
+  .collection-tile:hover .collection-img { transform: scale(1.04); }
+  .collection-tile:hover .collection-overlay { opacity: 1.5; }
+
+  @media (max-width: 900px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .collections-grid { grid-template-columns: repeat(2, 1fr); }
+    .story-grid { grid-template-columns: 1fr; gap: 40px; }
+    .materials-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 540px) {
+    .collections-grid { grid-template-columns: 1fr; }
+  }
+</style>

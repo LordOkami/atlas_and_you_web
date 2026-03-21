@@ -19,151 +19,161 @@ const { title = 'Atlas&You — Joyería Artesanal', description = 'Joyería arte
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Trirong:ital,wght@0,200;0,300;0,400;1,200;1,300&family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400&display=swap" />
 </head>
-<body class="min-h-screen flex flex-col" style="background:#FAF9F7;">
+<body style="background:#EFECEC;color:#252525;">
 
-  <!-- Announcement bar -->
-  <div class="bg-stone-900 text-stone-200 text-xs text-center py-2.5 px-4 tracking-wide">
-    Envío gratis a España a partir de 50€ &nbsp;·&nbsp; Hecho a mano con amor en España
+  <!-- Announcement bar — sage green -->
+  <div style="background:#3F5147;color:#e8ede9;font-size:12px;text-align:center;padding:9px 16px;letter-spacing:0.05em;">
+    Envío gratis a España a partir de 50&nbsp;€ &nbsp;·&nbsp; Fabricado a mano en España
   </div>
 
   <!-- Navbar -->
-  <header id="navbar" class="bg-white border-b border-stone-200/70 sticky top-0 z-50 transition-shadow duration-300">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+  <header id="navbar" style="background:#FFFFFF;border-bottom:1px solid #DDD8C8;position:sticky;top:0;z-index:50;">
+    <div style="max-width:1440px;margin:0 auto;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;">
 
       <!-- Logo -->
-      <a href="/" class="flex-shrink-0">
-        <span class="font-serif text-2xl tracking-tight text-stone-900" style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;">
-          Atlas<span style="color:#92400E;">&You</span>
+      <a href="/" style="text-decoration:none;flex-shrink:0;">
+        <span style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:22px;letter-spacing:0.02em;color:#252525;">
+          Atlas<span style="color:#3F5147;">&amp;You</span>
         </span>
       </a>
 
       <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-8">
-        <a href="/tienda" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
-          Tienda
-        </a>
-        <a href="/tienda?categoria=pendientes" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
-          Pendientes
-        </a>
-        <a href="/tienda?categoria=colgantes" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
-          Colgantes
-        </a>
-        <a href="/tienda?categoria=pulseras" class="nav-link text-[13px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-stone-900 after:transition-all hover:after:w-full">
-          Pulseras
-        </a>
+      <nav class="desktop-nav" style="display:flex;align-items:center;gap:32px;">
+        {[
+          ['Tienda', '/tienda'],
+          ['Pendientes', '/tienda?categoria=pendientes'],
+          ['Colgantes', '/tienda?categoria=colgantes'],
+          ['Pulseras', '/tienda?categoria=pulseras'],
+        ].map(([label, href]) => (
+          <a href={href}
+            style="font-family:'Quattrocento Sans',sans-serif;font-size:12px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:#716A56;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent;transition:color 0.15s,border-color 0.15s;"
+            onmouseenter="this.style.color='#252525';this.style.borderBottomColor='#252525';"
+            onmouseleave="this.style.color='#716A56';this.style.borderBottomColor='transparent';"
+          >{label}</a>
+        ))}
       </nav>
 
       <!-- Actions -->
-      <div class="flex items-center gap-3">
-        <!-- Search -->
-        <a href="/tienda" class="hidden md:flex p-2 text-stone-500 hover:text-stone-900 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <div style="display:flex;align-items:center;gap:8px;">
+        <!-- Search icon -->
+        <a href="/tienda" class="desktop-only" style="padding:8px;color:#716A56;text-decoration:none;display:flex;" aria-label="Buscar">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </a>
         <!-- Cart -->
-        <a href="/carrito" class="relative p-2 text-stone-500 hover:text-stone-900 transition-colors" id="cart-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        <a href="/carrito" id="cart-btn" style="position:relative;padding:8px;color:#716A56;text-decoration:none;display:flex;" aria-label="Carrito">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
           </svg>
-          <span id="cart-count" class="absolute -top-0.5 -right-0.5 text-white text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center hidden" style="background:#92400E;">0</span>
+          <span id="cart-count" style="display:none;position:absolute;top:2px;right:2px;background:#3F5147;color:#fff;font-size:10px;font-weight:700;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;">0</span>
         </a>
-        <!-- Mobile menu -->
-        <button class="md:hidden p-2 text-stone-500 hover:text-stone-900 transition-colors" id="mobile-menu-btn" aria-label="Menú">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <!-- Mobile hamburger -->
+        <button id="mobile-menu-btn" class="mobile-only" style="padding:8px;background:none;border:none;cursor:pointer;color:#252525;" aria-label="Menú">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
       </div>
     </div>
 
-    <!-- Mobile nav panel -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
-      <nav class="flex flex-col px-6 py-6 gap-5">
-        <a href="/tienda" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Tienda</a>
-        <a href="/tienda?categoria=pendientes" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Pendientes</a>
-        <a href="/tienda?categoria=colgantes" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Colgantes</a>
-        <a href="/tienda?categoria=pulseras" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Pulseras</a>
-        <a href="/carrito" class="text-sm font-medium tracking-widest uppercase text-stone-700 hover:text-stone-900">Carrito</a>
+    <!-- Mobile drawer -->
+    <div id="mobile-menu" style="display:none;background:#fff;border-top:1px solid #DDD8C8;">
+      <nav style="padding:24px 32px;display:flex;flex-direction:column;gap:20px;">
+        {[
+          ['Tienda', '/tienda'],
+          ['Pendientes', '/tienda?categoria=pendientes'],
+          ['Colgantes', '/tienda?categoria=colgantes'],
+          ['Pulseras', '/tienda?categoria=pulseras'],
+        ].map(([label, href]) => (
+          <a href={href} style="font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#252525;text-decoration:none;font-weight:400;">{label}</a>
+        ))}
       </nav>
     </div>
   </header>
 
-  <main class="flex-1">
+  <main style="min-height:60vh;">
     <slot />
   </main>
 
   <!-- Footer -->
-  <footer style="background:#FAFAF9;border-top:1px solid #E7E5E4;">
-    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
-      <!-- Brand -->
-      <div class="col-span-2 md:col-span-1">
-        <span class="font-serif text-xl text-stone-900 block mb-4" style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;">
-          Atlas<span style="color:#92400E;">&You</span>
+  <footer style="background:#FAFAF8;border-top:1px solid #DDD8C8;margin-top:80px;">
+    <div style="max-width:1440px;margin:0 auto;padding:64px 32px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:48px;">
+
+      <div>
+        <span style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:20px;color:#252525;display:block;margin-bottom:16px;">
+          Atlas<span style="color:#3F5147;">&amp;You</span>
         </span>
-        <p class="text-stone-500 text-sm leading-relaxed max-w-52">
-          Joyería artesanal única, hecha a mano con arcilla polimérica y resina.
+        <p style="font-size:13px;color:#716A56;line-height:1.7;max-width:220px;">
+          Joyería artesanal única hecha a mano con arcilla polimérica y resina.
         </p>
-        <div class="flex gap-4 mt-5">
-          <a href="https://instagram.com/atlasandyou" target="_blank" rel="noopener" class="text-stone-400 hover:text-stone-700 transition-colors" aria-label="Instagram">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <div style="margin-top:20px;display:flex;gap:12px;">
+          <a href="https://instagram.com/atlasandyou" target="_blank" rel="noopener" style="color:#716A56;" aria-label="Instagram">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
             </svg>
           </a>
         </div>
       </div>
 
-      <!-- Tienda -->
       <div>
-        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Tienda</h5>
-        <ul class="space-y-3 text-sm text-stone-600">
-          <li><a href="/tienda" class="hover:text-stone-900 transition-colors">Todos los productos</a></li>
-          <li><a href="/tienda?categoria=pendientes" class="hover:text-stone-900 transition-colors">Pendientes</a></li>
-          <li><a href="/tienda?categoria=colgantes" class="hover:text-stone-900 transition-colors">Colgantes</a></li>
-          <li><a href="/tienda?categoria=pulseras" class="hover:text-stone-900 transition-colors">Pulseras</a></li>
+        <h5 style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#252525;margin-bottom:16px;">Tienda</h5>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          {[['Todos los productos','/tienda'],['Pendientes','/tienda?categoria=pendientes'],['Colgantes','/tienda?categoria=colgantes'],['Pulseras','/tienda?categoria=pulseras']].map(([l,h]) => (
+            <li><a href={h} style="font-size:13px;color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">{l}</a></li>
+          ))}
         </ul>
       </div>
 
-      <!-- Información -->
       <div>
-        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Información</h5>
-        <ul class="space-y-3 text-sm text-stone-600">
-          <li><a href="/envios" class="hover:text-stone-900 transition-colors">Envíos y devoluciones</a></li>
-          <li><a href="/cuidados" class="hover:text-stone-900 transition-colors">Guía de cuidados</a></li>
-          <li><a href="/aviso-legal" class="hover:text-stone-900 transition-colors">Aviso legal</a></li>
-          <li><a href="/privacidad" class="hover:text-stone-900 transition-colors">Privacidad</a></li>
+        <h5 style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#252525;margin-bottom:16px;">Información</h5>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          {[['Envíos y devoluciones','/envios'],['Guía de cuidados','/cuidados'],['Aviso legal','/aviso-legal'],['Privacidad','/privacidad']].map(([l,h]) => (
+            <li><a href={h} style="font-size:13px;color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">{l}</a></li>
+          ))}
         </ul>
       </div>
 
-      <!-- Contacto -->
       <div>
-        <h5 class="text-[11px] font-semibold tracking-widest uppercase text-stone-400 mb-4">Contacto</h5>
-        <ul class="space-y-3 text-sm text-stone-600">
-          <li><a href="/contacto" class="hover:text-stone-900 transition-colors">Escríbenos</a></li>
-          <li class="text-stone-400 text-xs leading-relaxed">Respondemos en menos de 24 horas</li>
-        </ul>
+        <h5 style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#252525;margin-bottom:16px;">Contacto</h5>
+        <p style="font-size:13px;color:#716A56;line-height:1.7;">
+          <a href="/contacto" style="color:#716A56;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#716A56'">Escríbenos</a><br/>
+          <span style="font-size:12px;">Respondemos en &lt; 24 h</span>
+        </p>
       </div>
     </div>
 
-    <div style="border-top:1px solid #E7E5E4;" class="py-5 text-center text-xs text-stone-400">
-      © {new Date().getFullYear()} Atlas&You — Joyería artesanal hecha en España
+    <div style="border-top:1px solid #DDD8C8;padding:20px 32px;text-align:center;font-size:12px;color:#9E9589;">
+      © {new Date().getFullYear()} Atlas&amp;You — Joyería artesanal hecha en España
     </div>
   </footer>
 
+  <style>
+    @media (max-width: 767px) {
+      .desktop-nav { display: none !important; }
+      .desktop-only { display: none !important; }
+      .mobile-only { display: flex !important; }
+    }
+    @media (min-width: 768px) {
+      .mobile-only { display: none !important; }
+      .desktop-only { display: flex !important; }
+    }
+  </style>
+
   <script>
     document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
-      document.getElementById('mobile-menu')?.classList.toggle('hidden');
+      const m = document.getElementById('mobile-menu');
+      if (m) m.style.display = m.style.display === 'none' ? 'block' : 'none';
     });
-
     function updateCartCount() {
       const cart = JSON.parse(localStorage.getItem('atlas_cart') || '[]');
-      const count = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
-      const badge = document.getElementById('cart-count');
+      const count = cart.reduce((s: number, i: any) => s + i.quantity, 0);
+      const badge = document.getElementById('cart-count') as HTMLElement;
       if (badge) {
         badge.textContent = count.toString();
-        badge.classList.toggle('hidden', count === 0);
+        badge.style.display = count > 0 ? 'flex' : 'none';
       }
     }
     updateCartCount();
