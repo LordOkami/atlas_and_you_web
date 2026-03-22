@@ -24,24 +24,18 @@ if (IS_MOCK) {
 <StoreLayout title="Atlas&You — Joyería Artesanal Hecha a Mano">
 
   <!-- ── HERO ──────────────────────────────────────────────────── -->
-  <section style="background:#2C3B31;position:relative;overflow:hidden;min-height:88vh;display:flex;align-items:center;">
+  <section style="background:#2C3B31;position:relative;overflow:hidden;min-height:88vh;display:grid;grid-template-columns:1fr 1fr;" class="hero-section">
 
-    <!-- Texture grain overlay -->
-    <div style="position:absolute;inset:0;opacity:0.06;background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E&quot;);"></div>
-
-    <!-- Warm accent shape -->
-    <div style="position:absolute;right:-80px;top:-80px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,#5a7a63 0%,transparent 70%);opacity:0.3;"></div>
-    <div style="position:absolute;left:40%;bottom:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,#8B7355 0%,transparent 70%);opacity:0.2;"></div>
-
-    <div style="max-width:1440px;margin:0 auto;padding:80px 32px;position:relative;z-index:1;">
-      <div style="max-width:640px;" class="fade-up">
+    <!-- Left: text -->
+    <div style="display:flex;align-items:center;padding:80px 64px 80px 32px;position:relative;z-index:1;max-width:720px;margin-left:auto;" class="hero-text">
+      <div>
         <p style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#a8c4b0;margin-bottom:24px;">
           Joyería Artesanal · Hecha en España
         </p>
-        <h1 style="font-family:'Trirong',Georgia,serif;font-weight:200;font-size:clamp(2.8rem,7vw,5.5rem);color:#FAFAF8;line-height:1.08;margin:0 0 28px;letter-spacing:-0.01em;">
+        <h1 style="font-family:'Trirong',Georgia,serif;font-weight:200;font-size:clamp(2.8rem,5vw,5rem);color:#FAFAF8;line-height:1.08;margin:0 0 28px;letter-spacing:-0.01em;">
           Joyas que<br/><em style="font-style:italic;font-weight:300;">cuentan historias</em>
         </h1>
-        <p style="font-size:16px;color:#a8c4b0;line-height:1.7;margin-bottom:40px;max-width:480px;">
+        <p style="font-size:16px;color:#a8c4b0;line-height:1.7;margin-bottom:40px;max-width:440px;">
           Pendientes, colgantes y pulseras creados a mano con arcilla polimérica y resina. Cada pieza, única e irrepetible.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
@@ -53,6 +47,16 @@ if (IS_MOCK) {
           </a>
         </div>
       </div>
+    </div>
+
+    <!-- Right: product lifestyle photo -->
+    <div style="position:relative;overflow:hidden;" class="hero-img-wrap">
+      <img
+        src="/images/products/peces-turquesa-lifestyle-1.jpg"
+        alt="Pendientes artesanales Atlas&You"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;"
+      />
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,#2C3B31 0%,transparent 20%);"></div>
     </div>
   </section>
 
@@ -138,15 +142,11 @@ if (IS_MOCK) {
       <!-- Image -->
       <div style="position:relative;">
         <div style="aspect-ratio:4/5;background:#DDD8C8;overflow:hidden;">
-          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#e8ede9 0%,#3F5147 100%);">
-            <div style="text-align:center;padding:32px;color:rgba(250,250,248,0.6);">
-              <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5" style="margin:0 auto 12px;display:block;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Foto de la artesana</span>
-            </div>
-          </div>
+          <img
+            src="/images/products/peces-turquesa-modelo-2.jpg"
+            alt="Pendientes peces turquesa — Atlas&You"
+            style="width:100%;height:100%;object-fit:cover;object-position:center top;"
+          />
         </div>
         <!-- Decorative small square -->
         <div style="position:absolute;bottom:-16px;right:-16px;width:80px;height:80px;background:#DDD8C8;z-index:-1;"></div>
@@ -252,7 +252,13 @@ if (IS_MOCK) {
   .collection-tile:hover .collection-img { transform: scale(1.04); }
   .collection-tile:hover .collection-overlay { opacity: 1.5; }
 
+  .hero-section { min-height: 88vh; }
+  .hero-img-wrap { min-height: 88vh; }
+
   @media (max-width: 900px) {
+    .hero-section { grid-template-columns: 1fr !important; }
+    .hero-img-wrap { min-height: 50vw; }
+    .hero-text { padding: 60px 32px !important; max-width: 100% !important; margin-left: 0 !important; }
     .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .collections-grid { grid-template-columns: repeat(2, 1fr); }
     .story-grid { grid-template-columns: 1fr; gap: 40px; }
