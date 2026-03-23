@@ -1,29 +1,36 @@
 ---
 import StoreLayout from '../../layouts/StoreLayout.astro';
 import ProductCard from '../../components/storefront/ProductCard.astro';
-import { getDb, IS_MOCK } from '../../lib/firebase-admin';
-import { mockProducts } from '../../lib/mock-data';
+import { getProduct, getProducts } from '../../lib/api';
 
 const { slug } = Astro.params;
 let product: any = null;
 let related: any[] = [];
 
-if (IS_MOCK) {
-  product = mockProducts.find(p => p.slug === slug && p.active) || null;
-  if (product) related = mockProducts.filter(p => p.category_id === product.category_id && p.id !== product.id && p.active).slice(0,4);
-} else {
-  const db = getDb();
-  const snap = await db.collection('products').where('slug','==',slug).where('active','==',true).limit(1).get();
-  if (!snap.empty) {
-    const doc = snap.docs[0];
-    product = { id: doc.id, ...doc.data() };
-    if (product.category_id) {
-      const catDoc = await db.collection('categories').doc(product.category_id).get();
-      if (catDoc.exists) product.categories = { id: catDoc.id, ...catDoc.data() };
-    }
-    const relSnap = await db.collection('products').where('category_id','==',product.category_id).where('active','==',true).limit(5).get();
-    related = relSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter((p: any) => p.id !== product.id).slice(0,4);
+try {
+  const raw = await getProduct(slug!);
+  // Phoenix returns category as a nested object; map to `categories` for template compatibility
+  product = {
+    ...raw,
+    price: parseFloat(raw.price),
+    compare_at_price: raw.compare_at_price ? parseFloat(raw.compare_at_price) : null,
+    categories: raw.category, // template uses product.categories.slug / .name
+  };
+
+  // Fetch related products from the same category
+  if (raw.category?.slug) {
+    const allInCategory = await getProducts({ category: raw.category.slug });
+    related = allInCategory
+      .filter(p => p.id !== raw.id)
+      .slice(0, 4)
+      .map(p => ({
+        ...p,
+        price: parseFloat(p.price),
+        compare_at_price: p.compare_at_price ? parseFloat(p.compare_at_price) : undefined,
+      }));
   }
+} catch {
+  product = null;
 }
 
 if (!product) return Astro.redirect('/tienda');

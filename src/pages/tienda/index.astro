@@ -1,36 +1,22 @@
 ---
 import StoreLayout from '../../layouts/StoreLayout.astro';
 import ProductCard from '../../components/storefront/ProductCard.astro';
-import { getDb, IS_MOCK } from '../../lib/firebase-admin';
-import { mockProducts, mockCategories } from '../../lib/mock-data';
+import { getProducts, getCategories } from '../../lib/api';
 
 const categoria = Astro.url.searchParams.get('categoria');
 const busqueda = Astro.url.searchParams.get('q');
 
-let products: any[] = [];
-let categories: any[] = [];
+const [productsRaw, categories] = await Promise.all([
+  getProducts({ category: categoria || undefined, search: busqueda || undefined }),
+  getCategories(),
+]);
 
-if (IS_MOCK) {
-  categories = mockCategories;
-  products = mockProducts.filter(p => p.active);
-  if (categoria) {
-    const cat = mockCategories.find(c => c.slug === categoria);
-    if (cat) products = products.filter(p => p.category_id === cat.id);
-  }
-  if (busqueda) products = products.filter(p => p.name.toLowerCase().includes(busqueda.toLowerCase()));
-} else {
-  const db = getDb();
-  const catSnap = await db.collection('categories').where('active','==',true).orderBy('position').get();
-  categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  let query: any = db.collection('products').where('active','==',true);
-  if (categoria) {
-    const cat = categories.find((c: any) => c.slug === categoria);
-    if (cat) query = query.where('category_id','==',cat.id);
-  }
-  const prodSnap = await query.orderBy('created_at','desc').get();
-  products = prodSnap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
-  if (busqueda) products = products.filter(p => p.name.toLowerCase().includes(busqueda.toLowerCase()));
-}
+// Phoenix returns price as string; convert to number for ProductCard compatibility
+const products = productsRaw.map(p => ({
+  ...p,
+  price: parseFloat(p.price),
+  compare_at_price: p.compare_at_price ? parseFloat(p.compare_at_price) : undefined,
+}));
 
 const activeCategory = categories.find((c: any) => c.slug === categoria);
 const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tienda Online — Atlas&You';

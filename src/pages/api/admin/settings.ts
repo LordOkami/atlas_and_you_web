@@ -1,14 +1,9 @@
+// Admin API routes have been moved to Phoenix backend.
+// The admin dashboard is now served by Phoenix LiveView at /admin.
 import type { APIRoute } from 'astro';
-import { getDb } from '../../../lib/firebase-admin';
 
-export const POST: APIRoute = async ({ request }) => {
-  const settings = await request.json();
-  const db = getDb();
-  const batch = db.batch();
-  Object.entries(settings).forEach(([key, value]) => {
-    const ref = db.collection('settings').doc(key);
-    batch.set(ref, { value: String(value), updated_at: new Date() }, { merge: true });
-  });
-  await batch.commit();
-  return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
-};
+const GONE = JSON.stringify({ error: 'Admin API moved to Phoenix backend. Use /admin in Phoenix.' });
+const headers = { 'Content-Type': 'application/json' };
+
+export const GET: APIRoute = async () => new Response(GONE, { status: 410, headers });
+export const POST: APIRoute = async () => new Response(GONE, { status: 410, headers });

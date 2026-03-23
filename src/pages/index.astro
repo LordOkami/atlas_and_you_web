@@ -1,24 +1,19 @@
 ---
 import StoreLayout from '../layouts/StoreLayout.astro';
 import ProductCard from '../components/storefront/ProductCard.astro';
-import { getDb, IS_MOCK } from '../lib/firebase-admin';
-import { mockProducts, mockCategories } from '../lib/mock-data';
+import { getProducts, getCategories } from '../lib/api';
 
-let featured: any[] = [];
-let categories: any[] = [];
+const [featuredRaw, categories] = await Promise.all([
+  getProducts({ featured: true }),
+  getCategories(),
+]);
 
-if (IS_MOCK) {
-  featured = mockProducts.filter(p => p.featured);
-  categories = mockCategories;
-} else {
-  const db = getDb();
-  const [featSnap, catSnap] = await Promise.all([
-    db.collection('products').where('active','==',true).where('featured','==',true).limit(8).get(),
-    db.collection('categories').where('active','==',true).orderBy('position').get(),
-  ]);
-  featured = featSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
+// Phoenix returns price as string; convert to number for ProductCard compatibility
+const featured = featuredRaw.map(p => ({
+  ...p,
+  price: parseFloat(p.price),
+  compare_at_price: p.compare_at_price ? parseFloat(p.compare_at_price) : undefined,
+}));
 ---
 
 <StoreLayout title="Atlas&You — Joyería Artesanal Hecha a Mano">
