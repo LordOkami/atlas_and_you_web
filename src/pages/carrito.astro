@@ -1,5 +1,6 @@
 ---
 import StoreLayout from '../layouts/StoreLayout.astro';
+const BACKEND_URL = import.meta.env.BACKEND_API_URL || 'http://localhost:4000';
 ---
 
 <StoreLayout title="Tu carrito — Atlas&You">
@@ -32,6 +33,10 @@ import StoreLayout from '../layouts/StoreLayout.astro';
             <div class="flex justify-between">
               <span class="text-stone-500">Subtotal</span>
               <span id="subtotal" class="font-medium">0,00€</span>
+            </div>
+            <div id="discount-row" class="hidden flex justify-between text-green-600">
+              <span id="discount-label">Descuento</span>
+              <span id="discount-amount">-0,00€</span>
             </div>
             <div class="flex justify-between">
               <span class="text-stone-500">Envío</span>
@@ -81,27 +86,31 @@ import StoreLayout from '../layouts/StoreLayout.astro';
     </div>
   </div>
 
-  <script>
+  <script define:vars={{ BACKEND_URL }}>
     const TAX_RATE = 0.21;
 
     function getCart() {
       return JSON.parse(localStorage.getItem('atlas_cart') || '[]');
     }
 
-    function saveCart(cart: any[]) {
+    function getDiscount() {
+      return JSON.parse(localStorage.getItem('atlas_discount') || 'null');
+    }
+
+    function saveCart(cart) {
       localStorage.setItem('atlas_cart', JSON.stringify(cart));
       window.dispatchEvent(new Event('cart-updated'));
     }
 
-    function formatPrice(n: number) {
+    function formatPrice(n) {
       return n.toFixed(2).replace('.', ',') + '€';
     }
 
     function renderCart() {
       const cart = getCart();
-      const emptyEl = document.getElementById('cart-empty')!;
-      const contentEl = document.getElementById('cart-content')!;
-      const itemsEl = document.getElementById('cart-items')!;
+      const emptyEl = document.getElementById('cart-empty');
+      const contentEl = document.getElementById('cart-content');
+      const itemsEl = document.getElementById('cart-items');
 
       if (cart.length === 0) {
         emptyEl.classList.remove('hidden');
@@ -112,7 +121,7 @@ import StoreLayout from '../layouts/StoreLayout.astro';
       emptyEl.classList.add('hidden');
       contentEl.classList.remove('hidden');
 
-      itemsEl.innerHTML = cart.map((item: any, idx: number) => `
+      itemsEl.innerHTML = cart.map((item, idx) => `
         <div class="bg-white rounded-xl border border-stone-200 p-4 flex gap-4">
           <img src="${item.image || '/placeholder.jpg'}" alt="${item.name}" class="w-20 h-20 rounded-lg object-cover bg-stone-100 flex-shrink-0" />
           <div class="flex-1 min-w-0">
@@ -135,22 +144,48 @@ import StoreLayout from '../layouts/StoreLayout.astro';
         </div>
       `).join('');
 
-      // Totales
-      const subtotal = cart.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
-      const tax = subtotal * TAX_RATE / (1 + TAX_RATE); // IVA incluido en precio
-      document.getElementById('subtotal')!.textContent = formatPrice(subtotal);
-      document.getElementById('tax')!.textContent = formatPrice(tax);
-      document.getElementById('total')!.textContent = formatPrice(subtotal);
+      updateTotals();
     }
 
-    (window as any).changeQty = function(idx: number, delta: number) {
+    function updateTotals() {
+      const cart = getCart();
+      const discount = getDiscount();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      let discountValue = 0;
+      const discountRow = document.getElementById('discount-row');
+
+      if (discount) {
+        if (discount.type === 'percentage') {
+          discountValue = subtotal * parseFloat(discount.value) / 100;
+        } else if (discount.type === 'fixed') {
+          discountValue = parseFloat(discount.value);
+        }
+        discountValue = Math.min(discountValue, subtotal);
+
+        document.getElementById('discount-label').textContent = `Descuento (${discount.code})`;
+        document.getElementById('discount-amount').textContent = `-${formatPrice(discountValue)}`;
+        discountRow.classList.remove('hidden');
+      } else {
+        discountRow.classList.add('hidden');
+      }
+
+      const afterDiscount = subtotal - discountValue;
+      const tax = afterDiscount * TAX_RATE / (1 + TAX_RATE);
+
+      document.getElementById('subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('tax').textContent = formatPrice(tax);
+      document.getElementById('total').textContent = formatPrice(afterDiscount);
+    }
+
+    window.changeQty = function(idx, delta) {
       const cart = getCart();
       cart[idx].quantity = Math.max(1, Math.min(cart[idx].stock, cart[idx].quantity + delta));
       saveCart(cart);
       renderCart();
     };
 
-    (window as any).removeItem = function(idx: number) {
+    window.removeItem = function(idx) {
       const cart = getCart();
       cart.splice(idx, 1);
       saveCart(cart);
@@ -159,22 +194,37 @@ import StoreLayout from '../layouts/StoreLayout.astro';
 
     // Código descuento
     document.getElementById('apply-discount')?.addEventListener('click', async () => {
-      const code = (document.getElementById('discount-code') as HTMLInputElement).value.trim();
+      const code = document.getElementById('discount-code').value.trim();
       if (!code) return;
 
-      const res = await fetch(`/api/discount/validate?code=${code}`);
-      const data = await res.json();
-      const msg = document.getElementById('discount-msg')!;
+      const cart = getCart();
+      const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
-      if (data.valid) {
-        msg.textContent = `✓ ${data.description}`;
-        msg.className = 'text-xs mt-1 text-green-600';
-        localStorage.setItem('atlas_discount', JSON.stringify(data));
-      } else {
-        msg.textContent = 'Código no válido o expirado';
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/v1/discounts/validate?code=${encodeURIComponent(code)}&subtotal=${subtotal}`);
+        const data = await res.json();
+        const msg = document.getElementById('discount-msg');
+
+        if (data.valid) {
+          const info = data.data;
+          // Store flat structure: {code, type, value, discount_amount}
+          localStorage.setItem('atlas_discount', JSON.stringify(info));
+          const label = info.type === 'percentage' ? `${parseFloat(info.value)}% de descuento` : `${parseFloat(info.value)}€ de descuento`;
+          msg.textContent = `✓ ${label}`;
+          msg.className = 'text-xs mt-1 text-green-600';
+        } else {
+          msg.textContent = 'Código no válido o expirado';
+          msg.className = 'text-xs mt-1 text-red-500';
+          localStorage.removeItem('atlas_discount');
+        }
+        msg.classList.remove('hidden');
+        updateTotals();
+      } catch {
+        const msg = document.getElementById('discount-msg');
+        msg.textContent = 'Error de conexión';
         msg.className = 'text-xs mt-1 text-red-500';
+        msg.classList.remove('hidden');
       }
-      msg.classList.remove('hidden');
     });
 
     renderCart();

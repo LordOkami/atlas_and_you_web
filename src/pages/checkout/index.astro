@@ -99,7 +99,7 @@ import StoreLayout from '../../layouts/StoreLayout.astro';
               <span id="checkout-subtotal" class="font-medium">—</span>
             </div>
             <div id="discount-row" class="hidden flex justify-between text-green-600">
-              <span>Descuento</span>
+              <span id="discount-label">Descuento</span>
               <span id="checkout-discount">—</span>
             </div>
             <div class="flex justify-between">
@@ -145,8 +145,20 @@ import StoreLayout from '../../layouts/StoreLayout.astro';
       return JSON.parse(localStorage.getItem('atlas_cart') || '[]');
     }
 
+    function getDiscount() {
+      return JSON.parse(localStorage.getItem('atlas_discount') || 'null');
+    }
+
     function formatPrice(n: number) {
       return n.toFixed(2).replace('.', ',') + '€';
+    }
+
+    function getDiscountValue(subtotal: number) {
+      const discount = getDiscount();
+      if (!discount) return 0;
+      if (discount.type === 'percentage') return Math.min(subtotal, subtotal * parseFloat(discount.value) / 100);
+      if (discount.type === 'fixed') return Math.min(subtotal, parseFloat(discount.value));
+      return 0;
     }
 
     function renderOrderItems() {
@@ -173,15 +185,30 @@ import StoreLayout from '../../layouts/StoreLayout.astro';
 
     function updateTotals() {
       const cart = getCart();
+      const discount = getDiscount();
       const subtotal = cart.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
-      const tax = subtotal * TAX_RATE / (1 + TAX_RATE);
-      const total = subtotal + selectedShippingCost;
+      const discountValue = getDiscountValue(subtotal);
+      const afterDiscount = subtotal - discountValue;
+      const tax = afterDiscount * TAX_RATE / (1 + TAX_RATE);
+      const total = afterDiscount + selectedShippingCost;
 
       document.getElementById('checkout-subtotal')!.textContent = formatPrice(subtotal);
       document.getElementById('checkout-tax')!.textContent = formatPrice(tax);
+      document.getElementById('checkout-total')!.textContent = formatPrice(total);
+
+      // Discount row
+      const discountRow = document.getElementById('discount-row')!;
+      if (discount && discountValue > 0) {
+        document.getElementById('discount-label')!.textContent = `Descuento (${discount.code})`;
+        document.getElementById('checkout-discount')!.textContent = `-${formatPrice(discountValue)}`;
+        discountRow.classList.remove('hidden');
+      } else {
+        discountRow.classList.add('hidden');
+      }
+
+      // Shipping
       document.getElementById('checkout-shipping')!.textContent =
         selectedShippingCost === 0 && selectedShippingRateId ? 'Gratis' : selectedShippingRateId ? formatPrice(selectedShippingCost) : 'Por calcular';
-      document.getElementById('checkout-total')!.textContent = formatPrice(total);
     }
 
     // Calcular envío cuando cambia el país
@@ -266,7 +293,7 @@ import StoreLayout from '../../layouts/StoreLayout.astro';
       errorEl.classList.add('hidden');
 
       const cart = getCart();
-      const discount = JSON.parse(localStorage.getItem('atlas_discount') || 'null');
+      const discount = getDiscount();
 
       try {
         const res = await fetch('/api/stripe/checkout', {
@@ -280,6 +307,7 @@ import StoreLayout from '../../layouts/StoreLayout.astro';
             shippingAddress: { name: `${firstName} ${lastName}`, street, city, postalCode, province, country },
             notes,
             discountCode: discount?.code || null,
+            discountType: discount?.type || null,
           }),
         });
 
