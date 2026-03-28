@@ -3,6 +3,10 @@ import { defineMiddleware } from 'astro:middleware';
 const BACKEND_URL = import.meta.env.BACKEND_API_URL || 'http://localhost:4000';
 const BYPASS_COOKIE = 'atlas_preview';
 
+if (import.meta.env.PROD && BACKEND_URL.includes('localhost')) {
+  console.error('WARNING: BACKEND_API_URL not configured for production');
+}
+
 // Cache maintenance status for 10 seconds to avoid hammering the backend
 let maintenanceCache: { enabled: boolean; message: string } | null = null;
 let maintenanceCacheTime = 0;
@@ -172,7 +176,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Proxy /uploads/* to the Phoenix backend (product images)
   if (pathname.startsWith('/uploads/')) {
-    const res = await fetch(`${BACKEND_URL}${pathname}`);
+    // Prevent path traversal
+    const normalized = new URL(pathname, 'http://localhost').pathname;
+    if (!normalized.startsWith('/uploads/')) {
+      return new Response('Forbidden', { status: 403 });
+    }
+    const res = await fetch(`${BACKEND_URL}${normalized}`);
     return new Response(res.body, {
       status: res.status,
       headers: {
@@ -199,7 +208,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const data = await res.json();
         if (data.token_valid) {
           const response = context.redirect(pathname, 302);
-          response.headers.set('Set-Cookie', `${BYPASS_COOKIE}=${previewToken}; Path=/; Max-Age=86400; SameSite=Lax`);
+          response.headers.set('Set-Cookie', `${BYPASS_COOKIE}=${previewToken}; Path=/; Max-Age=86400; SameSite=Lax; Secure; HttpOnly`);
           return response;
         }
       } catch {}

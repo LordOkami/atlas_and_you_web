@@ -1,5 +1,9 @@
 const BACKEND_URL = import.meta.env.BACKEND_API_URL || 'http://localhost:4000';
 
+if (import.meta.env.PROD && BACKEND_URL.includes('localhost')) {
+  console.error('WARNING: BACKEND_API_URL not configured for production');
+}
+
 export interface Product {
   id: string;
   name: string;
