@@ -4,6 +4,15 @@ const resend = new Resend(import.meta.env.RESEND_API_KEY);
 const ADMIN_EMAIL = import.meta.env.ADMIN_EMAIL;
 const FROM_EMAIL = 'Atlas&You <noreply@atlasandyou.es>';
 
+function escapeHtml(str: string): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export async function sendOrderConfirmation(order: any) {
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -36,14 +45,14 @@ export async function sendLowStockAlert(product: any) {
     from: FROM_EMAIL,
     to: ADMIN_EMAIL,
     subject: `⚠️ Stock bajo: ${product.name} (${product.stock} unidades)`,
-    html: `<p>El producto <strong>${product.name}</strong> tiene stock bajo: <strong>${product.stock} unidades</strong>.</p>`,
+    html: `<p>El producto <strong>${escapeHtml(product.name)}</strong> tiene stock bajo: <strong>${product.stock} unidades</strong>.</p>`,
   });
 }
 
 function orderConfirmationHtml(order: any) {
   const itemsHtml = order.items.map((item: any) => `
     <tr>
-      <td style="padding:8px;border-bottom:1px solid #eee">${item.name}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee">${escapeHtml(item.name)}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${item.quantity}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${item.unit_price.toFixed(2)}€</td>
     </tr>
@@ -57,8 +66,8 @@ function orderConfirmationHtml(order: any) {
       </div>
       <div style="padding:30px">
         <h2>¡Gracias por tu pedido!</h2>
-        <p>Hola ${order.customer_name}, hemos recibido tu pedido correctamente.</p>
-        <p><strong>Pedido #${order.order_number}</strong></p>
+        <p>Hola ${escapeHtml(order.customer_name)}, hemos recibido tu pedido correctamente.</p>
+        <p><strong>Pedido #${escapeHtml(order.order_number)}</strong></p>
 
         <table style="width:100%;border-collapse:collapse;margin:20px 0">
           <thead>
@@ -82,10 +91,10 @@ function orderConfirmationHtml(order: any) {
         <hr style="margin:20px 0">
         <h3>Dirección de envío</h3>
         <p>
-          ${order.shipping_address.name}<br>
-          ${order.shipping_address.street}<br>
-          ${order.shipping_address.postal_code} ${order.shipping_address.city}<br>
-          ${order.shipping_address.country}
+          ${escapeHtml(order.shipping_address.name)}<br>
+          ${escapeHtml(order.shipping_address.street)}<br>
+          ${escapeHtml(order.shipping_address.postal_code)} ${escapeHtml(order.shipping_address.city)}<br>
+          ${escapeHtml(order.shipping_address.country)}
         </p>
       </div>
       <div style="background:#f5f5f5;padding:20px;text-align:center;font-size:12px;color:#999">
@@ -98,11 +107,11 @@ function orderConfirmationHtml(order: any) {
 function adminNewOrderHtml(order: any) {
   return `
     <h2>Nuevo pedido recibido</h2>
-    <p><strong>Pedido:</strong> #${order.order_number}</p>
-    <p><strong>Cliente:</strong> ${order.customer_name} (${order.customer_email})</p>
+    <p><strong>Pedido:</strong> #${escapeHtml(order.order_number)}</p>
+    <p><strong>Cliente:</strong> ${escapeHtml(order.customer_name)} (${escapeHtml(order.customer_email)})</p>
     <p><strong>Total:</strong> ${order.total.toFixed(2)}€</p>
-    <p><strong>Envío a:</strong> ${order.shipping_address.city}, ${order.shipping_address.country}</p>
-    <p><a href="${import.meta.env.PUBLIC_SITE_URL}/admin/pedidos/${order.id}">Ver pedido en el panel</a></p>
+    <p><strong>Envío a:</strong> ${escapeHtml(order.shipping_address.city)}, ${escapeHtml(order.shipping_address.country)}</p>
+    <p><a href="${import.meta.env.PUBLIC_SITE_URL}/admin/pedidos/${escapeHtml(order.id)}">Ver pedido en el panel</a></p>
   `;
 }
 
@@ -114,12 +123,12 @@ function shippingNotificationHtml(order: any) {
       </div>
       <div style="padding:30px">
         <h2>¡Tu pedido está en camino!</h2>
-        <p>Hola ${order.customer_name}, tu pedido #${order.order_number} ha sido enviado.</p>
+        <p>Hola ${escapeHtml(order.customer_name)}, tu pedido #${escapeHtml(order.order_number)} ha sido enviado.</p>
         ${order.tracking_number ? `
           <div style="background:#f5f5f5;padding:15px;border-radius:8px;margin:20px 0">
-            <p style="margin:0"><strong>Transportista:</strong> ${order.shipping_carrier}</p>
-            <p style="margin:5px 0 0"><strong>Número de seguimiento:</strong> ${order.tracking_number}</p>
-            ${order.tracking_url ? `<p style="margin:5px 0 0"><a href="${order.tracking_url}">Seguir mi envío</a></p>` : ''}
+            <p style="margin:0"><strong>Transportista:</strong> ${escapeHtml(order.shipping_carrier)}</p>
+            <p style="margin:5px 0 0"><strong>Número de seguimiento:</strong> ${escapeHtml(order.tracking_number)}</p>
+            ${order.tracking_url ? `<p style="margin:5px 0 0"><a href="${escapeHtml(order.tracking_url)}">Seguir mi envío</a></p>` : ''}
           </div>
         ` : ''}
         <p>Recibirás tu pedido en los próximos días. ¡Gracias por confiar en Atlas&You!</p>

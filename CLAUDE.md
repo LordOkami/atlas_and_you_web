@@ -17,7 +17,7 @@ No test framework is configured.
 
 ## Architecture
 
-**Framework:** Astro 6 in full SSR mode (`output: 'server'`) with Netlify adapter. Tailwind CSS v4 via Vite plugin.
+**Framework:** Astro 6 in full SSR mode (`output: 'server'`) with Node adapter (standalone). Deployed on Fly.io (app: `atlas-and-you-web`). Tailwind CSS v4 via Vite plugin.
 
 **Auth:** Firebase Auth for admin login. Client SDK (`src/lib/firebase.ts`) handles sign-in on the frontend; Admin SDK (`src/lib/firebase-admin.ts`) verifies session cookies server-side via `src/lib/auth.ts`. Both SDKs support a `IS_MOCK` mode that activates when Firebase credentials are missing/placeholder — this lets development work without a Firebase project.
 

@@ -29,5 +29,10 @@ export async function requireAdmin(request: Request) {
 
 function parseCookie(cookieStr: string, name: string): string | null {
   const match = cookieStr.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : null;
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
 }

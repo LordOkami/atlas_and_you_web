@@ -65,14 +65,12 @@ function renderMaintenancePage(message: string, isPreview: boolean): Response {
       max-width: 540px;
     }
     .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1c1917;
-      letter-spacing: -0.02em;
       margin-bottom: 0.5rem;
     }
-    .logo span { color: #c2410c; }
+    .logo img {
+      height: 64px;
+      width: auto;
+    }
     .divider {
       width: 60px;
       height: 2px;
@@ -139,7 +137,7 @@ function renderMaintenancePage(message: string, isPreview: boolean): Response {
 <body>
   <div class="bg-pattern"></div>
   <div class="content">
-    <div class="logo">Atlas<span>&</span>You</div>
+    <div class="logo"><img src="/images/logo.png" alt="Atlas&You" /></div>
     <div class="divider"></div>
     <p class="message">${escapeHtml(message)}</p>
     <div class="dots">
@@ -166,12 +164,29 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+const SECURITY_HEADERS: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '0',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Content-Security-Policy':
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://*.googleapis.com wss:; frame-src https://js.stripe.com; font-src 'self'; frame-ancestors 'none'",
+};
+
+function addSecurityHeaders(response: Response): Response {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, searchParams } = context.url;
 
   // Redirect /admin* to the Phoenix backend
   if (pathname === '/admin' || pathname.startsWith('/admin/') || pathname.startsWith('/admin_users/')) {
-    return context.redirect(`${BACKEND_URL}${pathname}`, 302);
+    return addSecurityHeaders(context.redirect(`${BACKEND_URL}${pathname}`, 302));
   }
 
   // Proxy /uploads/* to the Phoenix backend (product images)
@@ -179,21 +194,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Prevent path traversal
     const normalized = new URL(pathname, 'http://localhost').pathname;
     if (!normalized.startsWith('/uploads/')) {
-      return new Response('Forbidden', { status: 403 });
+      return addSecurityHeaders(new Response('Forbidden', { status: 403 }));
     }
     const res = await fetch(`${BACKEND_URL}${normalized}`);
-    return new Response(res.body, {
+    return addSecurityHeaders(new Response(res.body, {
       status: res.status,
       headers: {
         'Content-Type': res.headers.get('Content-Type') || 'application/octet-stream',
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
-    });
+    }));
   }
 
   // Skip maintenance check for API routes and static assets
   if (pathname.startsWith('/api/') || pathname.startsWith('/_') || pathname.match(/\.\w+$/)) {
-    return next();
+    const response = await next();
+    return addSecurityHeaders(response);
   }
 
   // Check maintenance mode
@@ -208,8 +224,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const data = await res.json();
         if (data.token_valid) {
           const response = context.redirect(pathname, 302);
-          response.headers.set('Set-Cookie', `${BYPASS_COOKIE}=${previewToken}; Path=/; Max-Age=86400; SameSite=Lax; Secure; HttpOnly`);
-          return response;
+          response.headers.set('Set-Cookie', `${BYPASS_COOKIE}=${previewToken}; Path=/; Max-Age=86400; SameSite=Strict; Secure; HttpOnly`);
+          return addSecurityHeaders(response);
         }
       } catch {}
       // Invalid token — fall through to maintenance page
@@ -225,15 +241,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/v1/maintenance/status?token=${encodeURIComponent(bypassToken)}`);
         const data = await res.json();
-        if (data.token_valid) return next();
+        if (data.token_valid) {
+          const response = await next();
+          return addSecurityHeaders(response);
+        }
       } catch {
-        return next(); // If backend unreachable, let them through
+        const response = await next(); // If backend unreachable, let them through
+        return addSecurityHeaders(response);
       }
     }
 
     // No bypass → show maintenance page
-    return renderMaintenancePage(maintenance.message, false);
+    return addSecurityHeaders(renderMaintenancePage(maintenance.message, false));
   }
 
-  return next();
+  const response = await next();
+  return addSecurityHeaders(response);
 });
