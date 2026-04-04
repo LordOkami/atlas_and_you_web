@@ -18,6 +18,7 @@ export interface Product {
   active: boolean;
   featured: boolean;
   sku: string | null;
+  collection: string | null;
   category: { id: string; name: string; slug: string } | null;
 }
 
@@ -27,6 +28,12 @@ export interface Category {
   slug: string;
   description: string;
   position: number;
+}
+
+export interface Collection {
+  name: string;
+  slug: string;
+  product_count: number;
 }
 
 export interface ShippingRate {
@@ -57,11 +64,13 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 export async function getProducts(params?: {
   category?: string;
+  collection?: string;
   search?: string;
   featured?: boolean;
 }): Promise<Product[]> {
   const qs = new URLSearchParams();
   if (params?.category) qs.set('category', params.category);
+  if (params?.collection) qs.set('collection', params.collection);
   if (params?.search) qs.set('search', params.search);
   if (params?.featured) qs.set('featured', 'true');
   const query = qs.toString();
@@ -80,6 +89,11 @@ export async function getProduct(slug: string): Promise<Product> {
 
 export async function getCategories(): Promise<Category[]> {
   const data = await apiFetch<{ data: Category[] }>('/api/v1/categories');
+  return data.data;
+}
+
+export async function getCollections(): Promise<Collection[]> {
+  const data = await apiFetch<{ data: Collection[] }>('/api/v1/collections');
   return data.data;
 }
 

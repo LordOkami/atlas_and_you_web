@@ -1,12 +1,15 @@
 ---
 import StoreLayout from '../layouts/StoreLayout.astro';
 import ProductCard from '../components/storefront/ProductCard.astro';
-import { getProducts, getCategories } from '../lib/api';
+import { getProducts, getCategories, getCollections } from '../lib/api';
 
-const [featuredRaw, categories] = await Promise.all([
+const [featuredRaw, categories, collections] = await Promise.all([
   getProducts({ featured: true }),
   getCategories(),
+  getCollections(),
 ]);
+
+const collectionDisplayName = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
 
 // Phoenix returns price as string; convert to number for ProductCard compatibility
 const featured = featuredRaw.map(p => ({
@@ -97,31 +100,39 @@ const featured = featuredRaw.map(p => ({
   )}
 
   <!-- ── COLLECTIONS BANNER ────────────────────────────────────── -->
-  {categories.length > 0 && (
+  {collections.length > 0 && (
     <section style="background:#fff;padding:56px 0;border-top:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;">
       <div style="max-width:1440px;margin:0 auto;padding:0 24px;">
         <div style="text-align:center;margin-bottom:36px;">
-          <p style="font-size:11px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#2B8080;margin-bottom:8px;">Explorar</p>
+          <p style="font-size:11px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#c7875a;margin-bottom:8px;">Explorar</p>
           <h2 style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.6rem);color:#1a1a1a;margin:0;">Nuestras Colecciones</h2>
+          <p style="font-size:14px;color:#888;margin-top:10px;">Joyas inspiradas en los destinos que más nos inspiran</p>
         </div>
         <div class="collections-grid">
-          {categories.slice(0,3).map((cat: any, i: number) => (
-            <a href={`/tienda?categoria=${cat.slug}`}
-              style={`display:block;position:relative;overflow:hidden;text-decoration:none;aspect-ratio:${i === 0 ? '3/4' : '4/3'};background:#e8f4f4;`}
-              class="collection-tile"
-            >
-              {cat.image_url ? (
-                <img src={cat.image_url} alt={cat.name} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.6s ease;" class="collection-img"/>
-              ) : (
-                <div style={`position:absolute;inset:0;background:${i===0?'linear-gradient(160deg,#b2d8d8,#1F6666)':i===1?'linear-gradient(160deg,#d4e8e8,#2B8080)':'linear-gradient(160deg,#c8e0e0,#256868)'};`}></div>
-              )}
-              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 55%);"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px;">
-                <h3 style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:1.5rem;color:#fff;margin:0 0 4px;">{cat.name}</h3>
-                <span style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.75);">Descubrir →</span>
-              </div>
-            </a>
-          ))}
+          {collections.map((col: any, i: number) => {
+            const gradients = [
+              'linear-gradient(160deg,#e8c9a0,#c7875a)',
+              'linear-gradient(160deg,#b2d8d8,#1F6666)',
+              'linear-gradient(160deg,#d4b8c4,#8b5a6b)',
+              'linear-gradient(160deg,#c8d4b8,#6b8b5a)',
+              'linear-gradient(160deg,#b8c4d4,#5a6b8b)',
+              'linear-gradient(160deg,#d4c8b8,#8b7a5a)',
+            ];
+            return (
+              <a href={`/tienda?coleccion=${col.slug}`}
+                style="display:block;position:relative;overflow:hidden;text-decoration:none;aspect-ratio:3/2;"
+                class="collection-tile"
+              >
+                <div style={`position:absolute;inset:0;background:${gradients[i % gradients.length]};transition:transform 0.6s ease;`} class="collection-img"></div>
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 60%);"></div>
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;">
+                  <h3 style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:1.4rem;color:#fff;margin:0 0 4px;">{collectionDisplayName(col.name)}</h3>
+                  <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);">{col.product_count} {col.product_count === 1 ? 'pieza' : 'piezas'}</span>
+                  <span style="display:block;margin-top:8px;font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.85);">Descubrir →</span>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -174,7 +185,7 @@ const featured = featuredRaw.map(p => ({
   }
   .collections-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
   }
   .story-grid {
@@ -187,7 +198,7 @@ const featured = featuredRaw.map(p => ({
 
   @media (max-width: 960px) {
     .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .collections-grid { grid-template-columns: repeat(2, 1fr); }
+    .collections-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .story-grid { grid-template-columns: 1fr; gap: 40px; }
     .values-strip { grid-template-columns: repeat(2, 1fr); }
   }

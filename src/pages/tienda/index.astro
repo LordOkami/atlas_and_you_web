@@ -1,14 +1,16 @@
 ---
 import StoreLayout from '../../layouts/StoreLayout.astro';
 import ProductCard from '../../components/storefront/ProductCard.astro';
-import { getProducts, getCategories } from '../../lib/api';
+import { getProducts, getCategories, getCollections } from '../../lib/api';
 
 const categoria = Astro.url.searchParams.get('categoria');
+const coleccion = Astro.url.searchParams.get('coleccion');
 const busqueda = Astro.url.searchParams.get('q');
 
-const [productsRaw, categories] = await Promise.all([
-  getProducts({ category: categoria || undefined, search: busqueda || undefined }),
+const [productsRaw, categories, collections] = await Promise.all([
+  getProducts({ category: categoria || undefined, collection: coleccion || undefined, search: busqueda || undefined }),
   getCategories(),
+  getCollections(),
 ]);
 
 // Phoenix returns price as string; convert to number for ProductCard compatibility
@@ -19,7 +21,16 @@ const products = productsRaw.map(p => ({
 }));
 
 const activeCategory = categories.find((c: any) => c.slug === categoria);
-const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tienda Online — Atlas&You';
+const activeCollection = coleccion ? collections.find((c: any) => c.slug === coleccion) : null;
+
+// Capitalize first letter for display
+const collectionDisplayName = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
+
+const pageTitle = activeCollection
+  ? `Colección ${collectionDisplayName(activeCollection.name)} — Atlas&You`
+  : activeCategory
+    ? `${activeCategory.name} — Atlas&You`
+    : 'Tienda Online — Atlas&You';
 ---
 
 <StoreLayout title={pageTitle}>
@@ -34,7 +45,7 @@ const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tie
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
     <div style="position:relative;z-index:1;text-align:center;padding:0 24px;">
       <h1 style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(2rem,5vw,3.5rem);color:#fff;margin:0 0 20px;line-height:1.05;">
-        {activeCategory ? activeCategory.name : 'Tienda Online'}
+        {activeCollection ? `Colección ${collectionDisplayName(activeCollection.name)}` : activeCategory ? activeCategory.name : 'Tienda Online'}
       </h1>
       <!-- Category pills on hero -->
       <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
@@ -46,6 +57,18 @@ const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tie
           >{cat.name}</a>
         ))}
       </div>
+      <!-- Collection pills -->
+      {collections.length > 0 && (
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:10px;">
+          {collections.map((col: any) => (
+            <a href={`/tienda?coleccion=${col.slug}`}
+              style={`display:inline-flex;align-items:center;gap:5px;padding:7px 18px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.15s;${coleccion === col.slug ? 'background:#c7875a;color:#fff;border:1.5px solid #c7875a;' : 'background:rgba(0,0,0,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.4);'}`}
+              onmouseenter={`this.style.background='#c7875a';this.style.borderColor='#c7875a'`}
+              onmouseleave={coleccion === col.slug ? '' : `this.style.background='rgba(0,0,0,0.2)';this.style.borderColor='rgba(255,255,255,0.4)'`}
+            >{collectionDisplayName(col.name)} <span style="opacity:0.7;font-weight:600;">({col.product_count})</span></a>
+          ))}
+        </div>
+      )}
     </div>
   </section>
 
@@ -58,11 +81,13 @@ const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tie
         <nav style="font-size:12px;color:#888;">
           <a href="/" style="color:#888;text-decoration:none;" onmouseenter="this.style.color='#2B8080'" onmouseleave="this.style.color='#888'">Inicio</a>
           <span style="margin:0 6px;">›</span>
-          {activeCategory ? (
+          {activeCategory || activeCollection ? (
             <>
               <a href="/tienda" style="color:#888;text-decoration:none;" onmouseenter="this.style.color='#2B8080'" onmouseleave="this.style.color='#888'">Tienda</a>
               <span style="margin:0 6px;">›</span>
-              <span style="color:#1a1a1a;font-weight:700;">{activeCategory.name}</span>
+              <span style="color:#1a1a1a;font-weight:700;">
+                {activeCollection ? `Colección ${collectionDisplayName(activeCollection.name)}` : activeCategory!.name}
+              </span>
             </>
           ) : (
             <span style="color:#1a1a1a;font-weight:700;">Tienda Online</span>
@@ -76,6 +101,7 @@ const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tie
         <!-- Search inline -->
         <form method="get" action="/tienda" style="display:flex;border:1px solid #e0e0e0;overflow:hidden;">
           {categoria && <input type="hidden" name="categoria" value={categoria} />}
+          {coleccion && <input type="hidden" name="coleccion" value={coleccion} />}
           <input
             type="text" name="q" value={busqueda || ''}
             placeholder="Buscar..."
@@ -87,8 +113,8 @@ const pageTitle = activeCategory ? `${activeCategory.name} — Atlas&You` : 'Tie
             </svg>
           </button>
         </form>
-        <!-- All categories link -->
-        {categoria && (
+        <!-- Clear filter link -->
+        {(categoria || coleccion) && (
           <a href="/tienda" style="font-size:12px;font-weight:700;color:#2B8080;text-decoration:none;white-space:nowrap;border-bottom:1px solid #2B8080;" onmouseenter="this.style.color='#1F6666'" onmouseleave="this.style.color='#2B8080'">
             × Ver todo
           </a>
