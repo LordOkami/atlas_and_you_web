@@ -10,6 +10,7 @@ interface Props {
     stock: number;
     featured?: boolean;
     tags?: string[];
+    collection?: string | null;
   };
 }
 
@@ -70,8 +71,10 @@ const discount = isOnSale ? Math.round((1 - product.price / product.compare_at_p
 
   <!-- Text -->
   <div class="product-card-info">
-    {product.tags && product.tags.length > 0 && (
-      <p class="product-card-tag">{product.tags[0]}</p>
+    {product.collection && (
+      <a href={`/tienda?coleccion=${product.collection}`} class="product-card-tag" onclick="event.stopPropagation()">
+        {product.collection.charAt(0).toUpperCase() + product.collection.slice(1)}
+      </a>
     )}
     <h3 class="product-card-name">{product.name}</h3>
     <div class="product-card-price">
@@ -188,6 +191,11 @@ const discount = isOnSale ? Math.round((1 - product.price / product.compare_at_p
     letter-spacing: 0.1em;
     font-weight: 700;
     margin: 0 0 4px;
+    text-decoration: none;
+    display: block;
+  }
+  .product-card-tag:hover {
+    text-decoration: underline;
   }
 
   .product-card-name {
