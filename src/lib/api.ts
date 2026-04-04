@@ -34,6 +34,8 @@ export interface Collection {
   name: string;
   slug: string;
   product_count: number;
+  description: string | null;
+  image_url: string | null;
 }
 
 export interface ShippingRate {

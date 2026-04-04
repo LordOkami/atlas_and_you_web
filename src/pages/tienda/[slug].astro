@@ -329,19 +329,13 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
   .gallery-nav-prev { left: 12px; }
   .gallery-nav-next { right: 12px; }
 
-  /* Desktop: hide arrows unless hovering the image container */
-  @media (hover: hover) {
-    .gallery-nav-btn { opacity: 0; }
-    .main-image-wrapper:hover .gallery-nav-btn { opacity: 1; }
-  }
-  /* Mobile / touch devices: always visible */
-  @media (hover: none) {
-    .gallery-nav-btn { opacity: 1; }
-  }
+  /* Always visible, brighter on hover */
+  .gallery-nav-btn { opacity: 0.65; }
+  .main-image-wrapper:hover .gallery-nav-btn { opacity: 1; }
 
   .product-layout {
     display: grid;
-    grid-template-columns: 1fr 480px;
+    grid-template-columns: minmax(280px, 460px) 1fr;
     gap: 64px;
     align-items: start;
   }
