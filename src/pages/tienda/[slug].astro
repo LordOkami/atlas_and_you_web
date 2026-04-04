@@ -72,12 +72,18 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
       <!-- Gallery -->
       <div>
         <!-- Main image -->
-        <div class="main-image-wrapper" style="aspect-ratio:4/5;overflow:hidden;background:#FFFFFF;border:1px solid #DDD8C8;box-shadow:0 2px 16px rgba(37,37,37,0.06);">
+        <div class="main-image-wrapper" style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#FFFFFF;border:1px solid #DDD8C8;box-shadow:0 2px 16px rgba(37,37,37,0.06);">
           <img id="main-image"
             src={product.images?.[0] || ''}
             alt={product.name}
             style="width:100%;height:100%;object-fit:contain;transition:opacity 0.25s;"
           />
+          {product.images && product.images.length > 1 && (
+            <>
+              <button id="prev-btn" class="gallery-nav-btn gallery-nav-prev" aria-label="Anterior">&#8592;</button>
+              <button id="next-btn" class="gallery-nav-btn gallery-nav-next" aria-label="Siguiente">&#8594;</button>
+            </>
+          )}
         </div>
 
         <!-- Thumbnails -->
@@ -223,18 +229,47 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
   </div>
 
   <script>
-    // Thumbnail gallery
-    document.querySelectorAll('.thumb-btn').forEach((btn, _, all) => {
-      btn.addEventListener('click', () => {
-        const src = (btn as HTMLElement).dataset.src;
-        const mainImg = document.getElementById('main-image') as HTMLImageElement;
-        if (mainImg && src) {
-          mainImg.style.opacity = '0';
-          setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 200);
-        }
-        all.forEach(b => (b as HTMLElement).style.borderColor = '#DDD8C8');
-        (btn as HTMLElement).style.borderColor = '#3F5147';
-      });
+    // Gallery controller — arrows, keyboard, swipe
+    const thumbBtns = [...document.querySelectorAll('.thumb-btn')] as HTMLElement[];
+    const images = thumbBtns.map(b => b.dataset.src || '');
+    const mainImg = document.getElementById('main-image') as HTMLImageElement | null;
+    let current = 0;
+
+    function goTo(index: number) {
+      current = (index + images.length) % images.length;
+      if (!mainImg || !images[current]) return;
+      mainImg.style.opacity = '0';
+      setTimeout(() => { mainImg.src = images[current]; mainImg.style.opacity = '1'; }, 180);
+      thumbBtns.forEach((b, i) => b.style.borderColor = i === current ? '#3F5147' : '#DDD8C8');
+    }
+
+    // Thumbnail clicks
+    thumbBtns.forEach((btn, i) => btn.addEventListener('click', () => goTo(i)));
+
+    // Prev/Next buttons
+    document.getElementById('prev-btn')?.addEventListener('click', () => goTo(current - 1));
+    document.getElementById('next-btn')?.addEventListener('click', () => goTo(current + 1));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
+      if (e.key === 'ArrowLeft') goTo(current - 1);
+      if (e.key === 'ArrowRight') goTo(current + 1);
+    });
+
+    // Swipe navigation (mobile)
+    let touchStartX = 0, touchStartY = 0;
+    const mainContainer = mainImg?.parentElement;
+    mainContainer?.addEventListener('touchstart', (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    mainContainer?.addEventListener('touchend', (e: TouchEvent) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        dx < 0 ? goTo(current + 1) : goTo(current - 1);
+      }
     });
 
     // Add to cart
@@ -267,6 +302,43 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 </StoreLayout>
 
 <style>
+  /* Gallery nav buttons */
+  .gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s, background 0.2s;
+    padding: 0;
+  }
+  .gallery-nav-btn:hover {
+    background: rgba(0,0,0,0.55);
+  }
+  .gallery-nav-prev { left: 12px; }
+  .gallery-nav-next { right: 12px; }
+
+  /* Desktop: hide arrows unless hovering the image container */
+  @media (hover: hover) {
+    .gallery-nav-btn { opacity: 0; }
+    .main-image-wrapper:hover .gallery-nav-btn { opacity: 1; }
+  }
+  /* Mobile / touch devices: always visible */
+  @media (hover: none) {
+    .gallery-nav-btn { opacity: 1; }
+  }
+
   .product-layout {
     display: grid;
     grid-template-columns: 1fr 480px;
