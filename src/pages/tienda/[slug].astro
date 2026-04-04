@@ -43,10 +43,10 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
 <StoreLayout title={`${product.name} — Atlas&You`} description={product.description}>
 
-  <div style="max-width:1440px;margin:0 auto;padding:40px 32px 80px;">
+  <div class="product-container" style="max-width:1440px;margin:0 auto;padding:40px 32px 80px;">
 
     <!-- Breadcrumb -->
-    <nav style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9E9589;margin-bottom:48px;">
+    <nav class="breadcrumb" style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9E9589;margin-bottom:48px;">
       <a href="/" style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">Inicio</a>
       <span style="color:#DDD8C8;">/</span>
       <a href="/tienda" style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">Tienda</a>
@@ -54,6 +54,12 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
         <>
           <span style="color:#DDD8C8;">/</span>
           <a href={`/tienda?categoria=${product.categories.slug}`} style="color:#9E9589;text-decoration:none;" onmouseenter="this.style.color='#252525'" onmouseleave="this.style.color='#9E9589'">{product.categories.name}</a>
+        </>
+      )}
+      {product.collection && (
+        <>
+          <span style="color:#DDD8C8;">/</span>
+          <a href={`/tienda?coleccion=${product.collection.toLowerCase()}`} style="color:#c7875a;text-decoration:none;" onmouseenter="this.style.color='#a06a3f'" onmouseleave="this.style.color='#c7875a'">{product.collection.charAt(0).toUpperCase() + product.collection.slice(1)}</a>
         </>
       )}
       <span style="color:#DDD8C8;">/</span>
@@ -66,7 +72,7 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
       <!-- Gallery -->
       <div>
         <!-- Main image -->
-        <div style="aspect-ratio:4/5;overflow:hidden;background:#FFFFFF;border:1px solid #DDD8C8;box-shadow:0 2px 16px rgba(37,37,37,0.06);">
+        <div class="main-image-wrapper" style="aspect-ratio:4/5;overflow:hidden;background:#FFFFFF;border:1px solid #DDD8C8;box-shadow:0 2px 16px rgba(37,37,37,0.06);">
           <img id="main-image"
             src={product.images?.[0] || ''}
             alt={product.name}
@@ -76,7 +82,7 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
         <!-- Thumbnails -->
         {product.images && product.images.length > 1 && (
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
+          <div class="thumb-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
             {product.images.map((img: string, i: number) => (
               <button class="thumb-btn"
                 style={`aspect-ratio:1;overflow:hidden;background:#fff;border:1.5px solid ${i === 0 ? '#3F5147' : '#DDD8C8'};cursor:pointer;padding:0;transition:border-color 0.15s;`}
@@ -91,13 +97,26 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
       <!-- Info -->
       <div>
-        <!-- Category + sale -->
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <!-- Category + collection + sale -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
           {product.categories && (
             <a href={`/tienda?categoria=${product.categories.slug}`}
               style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#3F5147;text-decoration:none;">
               {product.categories.name}
             </a>
+          )}
+          {product.collection && (
+            <>
+              <span style="color:#DDD8C8;font-size:10px;">|</span>
+              <a href={`/tienda?coleccion=${product.collection.toLowerCase()}`}
+                style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c7875a;text-decoration:none;"
+                onmouseenter="this.style.color='#a06a3f'"
+                onmouseleave="this.style.color='#c7875a'"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Colección {product.collection.charAt(0).toUpperCase() + product.collection.slice(1)}
+              </a>
+            </>
           )}
           {isOnSale && (
             <span style="background:#3F5147;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;">-{discount}%</span>
@@ -185,7 +204,7 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
 
     <!-- Related products -->
     {related.length > 0 && (
-      <section style="margin-top:80px;padding-top:48px;border-top:1px solid #DDD8C8;">
+      <section class="related-section" style="margin-top:80px;padding-top:48px;border-top:1px solid #DDD8C8;">
         <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;">
           <h2 style="font-family:'Trirong',Georgia,serif;font-weight:300;font-size:clamp(1.6rem,3vw,2.2rem);color:#252525;margin:0;">
             También te puede gustar
@@ -262,5 +281,13 @@ const isLowStock = product.stock > 0 && product.stock <= 3;
   @media (max-width: 960px) {
     .product-layout { grid-template-columns: 1fr; gap: 40px; }
     .related-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  }
+  @media (max-width: 600px) {
+    .product-container { padding: 24px 16px 48px !important; }
+    .breadcrumb { margin-bottom: 24px !important; }
+    .main-image-wrapper { aspect-ratio: 1/1 !important; }
+    .product-layout { gap: 24px; }
+    .thumb-btn { min-width: 44px; min-height: 44px; }
+    .related-section { margin-top: 48px !important; padding-top: 32px !important; }
   }
 </style>
